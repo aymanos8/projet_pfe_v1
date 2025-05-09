@@ -75,6 +75,7 @@ function tech_label($tech) {
                                 <th>Offre</th>
                                 <th>État</th>
                                 <th>Date de création</th>
+                                <th>Détail</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,6 +88,9 @@ function tech_label($tech) {
                                 <td><?php echo htmlspecialchars($wo['offre']); ?></td>
                                 <td><?php echo statut_label($wo['status']); ?></td>
                                 <td><?php echo date('j F Y', strtotime($wo['date'])); ?></td>
+                                <td>
+                                    <a class="btn-link" href="workorder_detail.php?id=<?php echo urlencode($wo['id']); ?>">Voir détail</a>
+                                </td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
