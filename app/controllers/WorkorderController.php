@@ -76,4 +76,15 @@ class WorkorderController {
             ];
         }
     }
+
+    public function index() {
+        require __DIR__ . '/../views/all_workorders.php';
+    }
+
+    public function detail($id) {
+        $cnx = getConnection();
+        $model = new WorkOrder($cnx);
+        $workorder = $model->getById($id);
+        require __DIR__ . '/../views/workorder_detail.php';
+    }
 }

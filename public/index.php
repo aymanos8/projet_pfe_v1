@@ -16,6 +16,8 @@ $router->get('/', [WorkorderController::class, 'index']);
 $router->get('/user/{id}', [ConfigController::class, 'show']);
 $router->get('/equipements', [EquipementController::class, 'index']);
 $router->get('/dashboard', [DashboardController::class, 'index']);
+$router->get('/workorders', [WorkorderController::class, 'index']);
+$router->get('/workorder_detail/{id}', [WorkorderController::class, 'detail']);
 
 // Routes POST
 $router->post('/user/create', [ConfigController::class, 'create']);

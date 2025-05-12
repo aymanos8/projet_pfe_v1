@@ -74,5 +74,16 @@ class WorkOrder
         $stmt = $this->cnx->prepare("DELETE FROM `work-orders` WHERE numero = ?");
         return $stmt->execute([$numero]);
     }
+
+    public function getById($id)
+    {
+        try {
+            $stmt = $this->cnx->prepare("SELECT * FROM `work-orders` WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la récupération du work order : " . $e->getMessage());
+        }
+    }
 }
 ?>

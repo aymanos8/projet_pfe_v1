@@ -1,24 +1,6 @@
 <?php
-require_once __DIR__ . '/../controllers/DashboardController.php';
-$controller = new DashboardController();
-
-$id = $_GET['id'] ?? null;
-if (!$id) {
-    echo "Aucun work order sélectionné.";
-    exit;
-}
-
-$workOrders = $controller->getWorkOrders();
-$workorder = null;
-foreach ($workOrders as $wo) {
-    if ($wo['id'] == $id) {
-        $workorder = $wo;
-        break;
-    }
-}
-
 if (!$workorder) {
-    echo "Work order introuvable.";
+    echo "Aucun work order sélectionné.";
     exit;
 }
 ?>
@@ -76,9 +58,9 @@ if (!$workorder) {
                 <h2>test</h2>
             </div>
             <ul class="nav-links">
-                <li><a href="dashboard.php"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
-                <li class="active"><a href="all_workorders.php"><i class="fas fa-tasks"></i> Work-Orders</a></li>
-                <li><a href="#"><i class="fas fa-server"></i> Équipements</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
+                <li class="active"><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="#"><i class="fas fa-cogs"></i> Configurations</a></li>
                 <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
                 <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>

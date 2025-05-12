@@ -111,4 +111,58 @@ tr:nth-child(even) {
 }
 .action-btn.delete {
     color: #dc2626;
-} 
+}
+
+/* Harmonisation avec la page Work-Orders */
+
+.work-orders-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.work-orders-card h2 {
+    margin-bottom: 20px;
+}
+
+#equipements-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#equipements-table th, #equipements-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#equipements-table th {
+    background-color: #f5f6fa;
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+}
+.status-badge.status-1 {
+    background-color: #ffd700;
+    color: #000;
+}
+.status-badge.status-0 {
+    background-color: #eee;
+    color: #888;
+}
+
+@media (max-width: 900px) {
+    .work-orders-card {
+        padding: 10px;
+    }
+    #equipements-table th, #equipements-table td {
+        padding: 8px 6px;
+    }
+}

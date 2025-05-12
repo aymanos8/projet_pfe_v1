@@ -35,9 +35,9 @@ function tech_label($tech) {
                 <h2>test</h2>
             </div>
             <ul class="nav-links">
-                <li class="active"><a href="dashboard.php"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
-                <li><a href="all_workorders.php"><i class="fas fa-tasks"></i> Work-Orders</a></li>
-                <li><a href="#"><i class="fas fa-server"></i> Équipements</a></li>
+                <li class="active"><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="#"><i class="fas fa-cogs"></i> Configurations</a></li>
                 <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
                 <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>

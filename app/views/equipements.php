@@ -1,93 +1,86 @@
+<?php
+require_once __DIR__ . '/../controllers/EquipementController.php';
+$controller = new EquipementController();
+$equipements = $controller->getEquipements();
+
+function disponibilite_label($status) {
+    switch ($status) {
+        case '1': return '<span class="status-badge status-1">Disponible</span>';
+        case '0': return '<span class="status-badge status-0">Non disponible</span>';
+        default: return htmlspecialchars($status);
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des équipements</title>
-    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/equipements.css">
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="wrapper">
+    <div class="container">
+        <!-- Sidebar -->
         <nav class="sidebar">
-            <h2>Network Order</h2>
-            <ul>
-                <li class="active"><a href="/equipements">Équipements</a></li>
-                <li><a href="/workorders">Workorders</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <!-- Ajoutez d'autres liens ici -->
+            <div class="sidebar-header">
+                <h2>test</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
+                <li class="active"><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
+                <li><a href="#"><i class="fas fa-cogs"></i> Configurations</a></li>
+                <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
+                <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
             </ul>
+            <div class="sidebar-footer">
+                <li><i class="fas fa-cog"></i> Paramètres</li>
+                <span class="version">v1.0.0</span>
+            </div>
         </nav>
+        <!-- Main Content -->
         <main class="main-content">
-            <div class="container">
-                <h1>Gestion des équipements</h1>
-                <input class="search-bar" type="text" placeholder="Rechercher par type ou modèle...">
-                <button class="btn-add">+ Ajouter un équipement</button>
-                <h2 style="margin-top: 48px;">Équipements disponibles</h2>
-                <table>
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="profile" id="profile-menu">
+                    <div class="profile-info">
+                        <span class="name"></span>
+                        <span class="role">Administrateur</span>
+                    </div>
+                </div>
+            </header>
+            <div class="dashboard-content">
+                <h2>Gestion des équipements</h2>
+                <table style="width:100%;margin-top:32px;background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.07);">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Type</th>
                             <th>Modèle</th>
                             <th>Capacité</th>
                             <th>Disponibilité</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php foreach ($equipements as $equipement): ?>
                         <tr>
-                            <td>Router</td>
-                            <td>Cisco ASR 1001-X</td>
-                            <td>2.5 Gbps</td>
-                            <td><span class="badge-dispo">Disponible</span></td>
-                            <td>
-                                <button class="action-btn edit">✏️</button>
-                                <button class="action-btn delete">🗑️</button>
-                            </td>
+                            <td><?php echo htmlspecialchars($equipement['id']); ?></td>
+                            <td><?php echo htmlspecialchars($equipement['type']); ?></td>
+                            <td><?php echo htmlspecialchars($equipement['modele']); ?></td>
+                            <td><?php echo htmlspecialchars($equipement['capacite']); ?></td>
+                            <td><?php echo $equipement['disponibilite'] ? '<span style=\'background:#ffd700;color:#000;padding:5px 10px;border-radius:15px;font-size:0.8rem;\'>Disponible</span>' : '<span style=\'background:#eee;color:#888;padding:5px 10px;border-radius:15px;font-size:0.8rem;\'>Indisponible</span>'; ?></td>
                         </tr>
-                        <tr>
-                            <td>Router</td>
-                            <td>Juniper MX104</td>
-                            <td>80 Gbps</td>
-                            <td><span class="badge-indispo">Non disponible</span></td>
-                            <td>
-                                <button class="action-btn edit">✏️</button>
-                                <button class="action-btn delete">🗑️</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Switch</td>
-                            <td>Cisco Catalyst 9300</td>
-                            <td>1 Gbps (48 ports)</td>
-                            <td><span class="badge-dispo">Disponible</span></td>
-                            <td>
-                                <button class="action-btn edit">✏️</button>
-                                <button class="action-btn delete">🗑️</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Router</td>
-                            <td>Cisco ISR 4431</td>
-                            <td>1 Gbps</td>
-                            <td><span class="badge-dispo">Disponible</span></td>
-                            <td>
-                                <button class="action-btn edit">✏️</button>
-                                <button class="action-btn delete">🗑️</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Switch</td>
-                            <td>Arista 7050X3</td>
-                            <td>10 Gbps (48 ports)</td>
-                            <td><span class="badge-indispo">Non disponible</span></td>
-                            <td>
-                                <button class="action-btn edit">✏️</button>
-                                <button class="action-btn delete">🗑️</button>
-                            </td>
-                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
-    <script src="/projet-pfe-v1/projet-t1/public/assets/js/equipements.js"></script>
 </body>
 </html> 

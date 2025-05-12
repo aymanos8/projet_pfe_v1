@@ -23,8 +23,8 @@ function tech_label($tech) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tous les Work Orders</title>
-    <link rel="stylesheet" href="../../public/assets/css/dashboard.css">
-    <link rel="stylesheet" href="../../public/assets/css/all_workorders.css">
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/all_workorders.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -35,9 +35,9 @@ function tech_label($tech) {
                 <h2>test</h2>
             </div>
             <ul class="nav-links">
-                <li><a href="dashboard.php"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
-                <li class="active"><a href="all_workorders.php"><i class="fas fa-tasks"></i> Work-Orders</a></li>
-                <li><a href="#"><i class="fas fa-server"></i> Équipements</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
+                <li class="active"><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="#"><i class="fas fa-cogs"></i> Configurations</a></li>
                 <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
                 <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
@@ -89,7 +89,7 @@ function tech_label($tech) {
                                 <td><?php echo statut_label($wo['status']); ?></td>
                                 <td><?php echo date('j F Y', strtotime($wo['date'])); ?></td>
                                 <td>
-                                    <a class="btn-link" href="workorder_detail.php?id=<?php echo urlencode($wo['id']); ?>">Voir détail</a>
+                                    <a class="btn-link" href="/projet-pfe-v1/projet-t1/public/workorder_detail/<?php echo urlencode($wo['id']); ?>">Voir détail</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -99,6 +99,6 @@ function tech_label($tech) {
             </div>
         </main>
     </div>
-    <script src="../../public/assets/js/all_workorders.js"></script>
+    <script src="/projet-pfe-v1/projet-t1/public/assets/js/all_workorders.js"></script>
 </body>
 </html> 
