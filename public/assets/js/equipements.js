@@ -1,0 +1,1 @@
+// JS pour la page équipements 

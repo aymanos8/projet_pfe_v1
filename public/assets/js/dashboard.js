@@ -16,7 +16,7 @@ const technologyLabels = {
     'fo': 'FO',
     'fh': 'FH',
     'blr': 'BLR',
-    'internet': 'internet'
+    
 };
 
 // Événements

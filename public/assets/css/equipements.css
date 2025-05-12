@@ -1,0 +1,114 @@
+body {
+    background: #f8fafc;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+.sidebar {
+    width: 250px;
+    background: #1e293b;
+    color: #fff;
+    padding: 32px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.sidebar h2 {
+    font-size: 1.5rem;
+    margin-bottom: 32px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+.sidebar ul li {
+    padding: 16px 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.sidebar ul li.active, .sidebar ul li:hover {
+    background: #2563eb;
+}
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+}
+.main-content {
+    flex: 1;
+    padding: 40px;
+    background: #f8fafc;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #0001;
+    padding: 32px;
+}
+.search-bar {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+.btn-add {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    float: right;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+th, td {
+    padding: 14px 10px;
+    text-align: left;
+}
+th {
+    background: #f1f5f9;
+}
+tr:nth-child(even) {
+    background: #f9fafb;
+}
+.badge-dispo {
+    background: #d1fae5;
+    color: #059669;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.95em;
+}
+.badge-indispo {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.95em;
+}
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 8px;
+}
+.action-btn.edit {
+    color: #2563eb;
+}
+.action-btn.delete {
+    color: #dc2626;
+} 

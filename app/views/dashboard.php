@@ -111,7 +111,7 @@ function tech_label($tech) {
                             <option value="fo">FO</option>
                             <option value="fh">FH</option>
                             <option value="blr">BLR</option>
-                            <option value="internet">internet</option>
+                            
                         </select>
                         <select id="status-filter">
                             <option value="">Tous les statuts</option>
