@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestion des équipements</title>
-    <link rel="stylesheet" href="assets/css/equipements.css">
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/equipements.css">
 </head>
 <body>
     <div class="wrapper">
@@ -88,6 +88,6 @@
             </div>
         </main>
     </div>
-    <script src="/assets/js/equipements.js"></script>
+    <script src="/projet-pfe-v1/projet-t1/public/assets/js/equipements.js"></script>
 </body>
 </html> 
