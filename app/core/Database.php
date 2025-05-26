@@ -35,9 +35,5 @@ class Database {
         return $this->connection;
     }
 
-    // Empêcher le clonage de l'instance
-    private function __clone() {}
 
-    // Empêcher la désérialisation de l'instance
-    public function __wakeup() {}
 }

@@ -18,9 +18,11 @@ $router->get('/equipements', [EquipementController::class, 'index']);
 $router->get('/dashboard', [DashboardController::class, 'index']);
 $router->get('/workorders', [WorkorderController::class, 'index']);
 $router->get('/workorder_detail/{id}', [WorkorderController::class, 'detail']);
+$router->get('/configuration', [ConfigController::class, 'index']);
 
 // Routes POST
 $router->post('/user/create', [ConfigController::class, 'create']);
+$router->post('/configuration/generer', [ConfigController::class, 'generer']);
 
 // Exécution du routeur
 $router->run();

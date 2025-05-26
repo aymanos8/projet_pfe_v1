@@ -18,7 +18,7 @@ class EquipementController {
 
     public function getEquipements() {
         try {
-            $query = "SELECT * FROM equipements ORDER BY id DESC";
+            $query = "SELECT * FROM equipements_eseau ORDER BY id DESC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

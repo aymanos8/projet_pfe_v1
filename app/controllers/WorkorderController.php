@@ -1,11 +1,11 @@
 <?php
 require_once __DIR__ . '/../models/WorkOrder.php';
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../core/Database.php';
 
 class WorkorderController {
     public function syncWorkOrders() {
         try {
-            $cnx = getConnection();
+            $cnx = Database::getInstance()->getConnection();
             $model = new WorkOrder($cnx);
 
             $url = "https://dev299646.service-now.com/api/now/table/wm_order";
@@ -60,7 +60,8 @@ class WorkorderController {
                 $offre = $wo['u_offre'] ?? '';
                 $status = $wo['state'] ?? '1';
                 $date = $wo['opened_at'] ?? date('Y-m-d H:i:s');
-                $model->save($numero, $client, $technology, $offre, $status, $date);
+                $short_description = $wo['short_description'] ?? null;
+                $model->save($numero, $client, $technology, $offre, $status, $date, $short_description);
                 $count++;
             }
 
@@ -82,7 +83,7 @@ class WorkorderController {
     }
 
     public function detail($id) {
-        $cnx = getConnection();
+        $cnx = Database::getInstance()->getConnection();
         $model = new WorkOrder($cnx);
         $workorder = $model->getById($id);
         require __DIR__ . '/../views/workorder_detail.php';

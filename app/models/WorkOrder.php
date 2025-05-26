@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
+// require_once __DIR__ . '/../config/database.php';
 
 class WorkOrder
 {
@@ -9,7 +9,7 @@ class WorkOrder
         $this->cnx = $cnx;
     }
 
-    public function save($numero, $client, $technology, $offre, $status, $date)
+    public function save($numero, $client, $technology, $offre, $status, $date, $short_description = null)
     {
         try {
             // Vérifier si le work order existe déjà
@@ -18,12 +18,12 @@ class WorkOrder
             
             if ($check->rowCount() > 0) {
                 // Mise à jour si existe
-                $stmt = $this->cnx->prepare("UPDATE `work-orders` SET client = ?, technology = ?, offre = ?, status = ?, date = ? WHERE numero = ?");
-                return $stmt->execute([$client, $technology, $offre, $status, $date, $numero]);
+                $stmt = $this->cnx->prepare("UPDATE `work-orders` SET client = ?, technology = ?, offre = ?, status = ?, date = ?, short_description = ? WHERE numero = ?");
+                return $stmt->execute([$client, $technology, $offre, $status, $date, $short_description, $numero]);
             } else {
                 // Insertion si n'existe pas
-                $stmt = $this->cnx->prepare("INSERT INTO `work-orders` (numero, client, technology, offre, status, date) VALUES (?, ?, ?, ?, ?, ?)");
-                return $stmt->execute([$numero, $client, $technology, $offre, $status, $date]);
+                $stmt = $this->cnx->prepare("INSERT INTO `work-orders` (numero, client, technology, offre, status, date, short_description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                return $stmt->execute([$numero, $client, $technology, $offre, $status, $date, $short_description]);
             }
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la sauvegarde du work order : " . $e->getMessage());

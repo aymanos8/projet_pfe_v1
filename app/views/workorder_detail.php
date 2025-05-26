@@ -61,7 +61,7 @@ if (!$workorder) {
                 <li><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
                 <li class="active"><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
-                <li><a href="#"><i class="fas fa-cogs"></i> Configurations</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
                 <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
                 <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
             </ul>

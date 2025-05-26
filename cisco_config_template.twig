@@ -1,0 +1,154 @@
+! ======================================================
+!              SERVICES GÉNÉRAUX
+! ======================================================
+hostname {{ROUTER_HOSTNAME}}
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 100000
+no logging console
+no logging monitor
+!
+
+! ======================================================
+!              AAA & AUTHENTIFICATION
+! ======================================================
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication login CONSOLE local group tacacs+
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default local group tacacs+ if-authenticated
+aaa authorization exec local_author local group tacacs+
+aaa authorization exec CONSOLE local group tacacs+ if-authenticated
+aaa authorization commands 1 local_author group tacacs+ local
+aaa authorization commands 4 default group tacacs+ local if-authenticated
+aaa authorization commands 15 default group tacacs+ local if-authenticated
+aaa session-id common
+ip tacacs source-interface {{INTERFACE_MGMT}}
+no tacacs-server host 172.17.17.74
+tacacs-server host 172.17.17.76
+tacacs-server host 172.17.17.76 single-connection timeout 1 
+tacacs-server directed-request
+tacacs-server key inwi2010
+
+
+! ======================================================
+!              COMPTES & MOTS DE PASSE
+! ======================================================
+enable secret {{ADMIN_PASS}}
+enable password {{ADMIN_PASS}}
+username {{ADMIN_USER}} privilege 15 password {{ADMIN_PASS}}
+
+! ======================================================
+!              INTERFACES & IP ADDRESSING
+! ======================================================
+interface {{INTERFACE_MGMT}}
+ description Interface Management
+ ip address 10.0.0.1 255.255.255.255
+!
+interface GigabitEthernet0/1
+ description LAN
+ ip address 192.168.1.1 255.255.255.0
+!
+{% for iface in INTERFACES %}
+interface {{ iface.NOM_INTERFACE }}
+ description {{ iface.DESCRIPTION }}
+ ip address {{ iface.LAN_IP }} {{ iface.LAN_MASK }}
+!
+{% endfor %}
+
+! ======================================================
+!              SERVICES IP & SÉCURITÉ
+! ======================================================
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip forward-protocol nd
+
+ip ssh version 2
+
+! ======================================================
+!              ROUTAGE STATIQUE
+! ======================================================
+no ip route 172.17.17.71 255.255.255.255
+no ip route 172.17.17.68 255.255.255.255
+no ip route 172.17.17.75 255.255.255.255
+no ip route 172.17.17.74 255.255.255.255
+no ip route 172.17.17.80 255.255.255.255
+no ip route 172.17.17.91 255.255.255.255
+no ip route 10.104.70.0 255.255.255.0 
+ip route 10.104.70.55 255.255.255.255 {{GATEWAY_MGMT}} name SolarW1
+ip route 10.104.70.65 255.255.255.255 {{GATEWAY_MGMT}} name SolarW2
+ip route 10.104.70.53 255.255.255.255 {{GATEWAY_MGMT}} name SolarW3
+ip route 10.104.70.38 255.255.255.255 {{GATEWAY_MGMT}} name JumpServer
+ip route 172.17.17.76 255.255.255.255 {{GATEWAY_MGMT}} name ACS
+ip route 10.104.143.5 255.255.255.255 {{GATEWAY_MGMT}} name NMIS
+ip route 10.104.70.44 255.255.255.255 {{GATEWAY_MGMT}} name SAUVEGARDE
+ip route 10.104.102.110 255.255.255.255 {{GATEWAY_MGMT}} name ServiceNow
+
+
+! ======================================================
+!              SNMP & SUPERVISION
+! ======================================================
+ip access-list standard ACL-SNMP
+    permit 10.104.143.5 !! NMIS
+    permit 10.104.70.55 !! Solarw1
+    permit 10.104.70.65 !! Solarw2
+    permit 10.104.70.53 !! Solarw3
+    permit 10.104.70.28 !!  MARWAN  
+    permit 10.104.102.110 !!  ServiceNow  
+
+snmp-server community private123 RO ACL-SNMP
+snmp-server host 10.104.70.53 private123
+no snmp-server enable traps
+snmp-server enable traps envmon
+snmp-server enable traps envmon shutdown 
+snmp-server enable traps envmon temperature 
+no snmp-server enable traps bgp state-changes!
+ 
+
+! ======================================================
+!              LISTES DE CONTRÔLE D'ACCÈS (ACL)
+! ======================================================
+no ip access-list standard 25 
+ip access-list standard 25 
+10 permit 10.104.70.38
+20 permit {{MGMT1}}
+30 permit {{MGMT2}}
+40 permit {{MGMT3}}
+50 permit 172.17.17.76
+60 permit {{MGMT1}} {{WILDWARD}} !! MGMT1 wildward
+70 permit  log
+{% for acl in ACLS_DYN %}
+{{ acl.num }} permit {{ acl.value }}
+{% endfor %}
+80 deny any
+line vty 0 4
+access-class 25 in
+transport outp all
+exit
+!
+
+! ======================================================
+!              SYNCHRONISATION TEMPORELLE (NTP)
+! ======================================================
+access-list 7 permit 10.104.143.5
+access-list 7 deny   any
+no ntp server 172.17.17.75
+ntp server 10.104.143.5
+ntp access-group peer 7
+clock timezone GMT+1 +1
+!
+
+! ======================================================
+!              PLAN DE CONTRÔLE
+! ======================================================
+control-plane
+
+! ======================================================
+!              FIN DE CONFIGURATION
+! ======================================================
+end 

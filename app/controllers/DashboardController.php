@@ -1,11 +1,11 @@
 <?php
 require_once __DIR__ . '/../models/WorkOrder.php';
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../core/Database.php';
 
 class DashboardController {
     public function getWorkOrders() {
         try {
-            $cnx = getConnection();
+            $cnx = Database::getInstance()->getConnection();
             $model = new WorkOrder($cnx);
             return $model->getAll();
         } catch (Exception $e) {
@@ -15,7 +15,7 @@ class DashboardController {
 
     public function getStatistics() {
         try {
-            $cnx = getConnection();
+            $cnx = Database::getInstance()->getConnection();
             $model = new WorkOrder($cnx);
             
             return [
