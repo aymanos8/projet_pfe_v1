@@ -23,6 +23,8 @@ $router->get('/configuration', [ConfigController::class, 'index']);
 // Routes POST
 $router->post('/user/create', [ConfigController::class, 'create']);
 $router->post('/configuration/generer', [ConfigController::class, 'generer']);
+$router->post('/workorder/affecter-equipement', [WorkorderController::class, 'affecterEquipement']);
+$router->post('/workorder/desaffecter-equipement', [WorkorderController::class, 'desaffecterEquipement']);
 
 // Exécution du routeur
 $router->run();

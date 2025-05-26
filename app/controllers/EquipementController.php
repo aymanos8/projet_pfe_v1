@@ -18,7 +18,7 @@ class EquipementController {
 
     public function getEquipements() {
         try {
-            $query = "SELECT * FROM equipements_eseau ORDER BY id DESC";
+            $query = "SELECT * FROM equipements_reseau ORDER BY id DESC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -26,6 +26,24 @@ class EquipementController {
             // En cas d'erreur, retourner un tableau vide
             error_log("Erreur lors de la récupération des équipements: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function ajouterEquipement($modele, $marque, $type_interfaces, $capacite, $numero_serie) {
+        try {
+            $query = "INSERT INTO equipements_reseau (modele, marque, type_interfaces, capacite, numero_serie) VALUES (:modele, :marque, :type_interfaces, :capacite, :numero_serie)";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                'modele' => $modele,
+                'marque' => $marque,
+                'type_interfaces' => $type_interfaces,
+                'capacite' => $capacite,
+                'numero_serie' => $numero_serie
+            ]);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Erreur lors de l'ajout d'un équipement: " . $e->getMessage());
+            return false;
         }
     }
 } 

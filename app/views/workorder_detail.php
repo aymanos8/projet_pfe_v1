@@ -86,6 +86,85 @@ if (!$workorder) {
                         <?php echo htmlspecialchars($workorder['short_description'] ?? 'Aucune description.'); ?>
                     </div>
                 </div>
+                <!-- Section Équipements -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Équipements affectés</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($equipements)): ?>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Modèle</th>
+                                            <th>Numéro de série</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($equipements as $equipement): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($equipement['marque']); ?></td>
+                                                <td><?php echo htmlspecialchars($equipement['modele']); ?></td>
+                                                <td><?php echo htmlspecialchars($equipement['numero_serie']); ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php echo $equipement['statut'] === 'disponible' ? 'success' : 'warning'; ?>">
+                                                        <?php echo htmlspecialchars($equipement['statut']); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="/projet-pfe-v1/projet-t1/public/configuration/generer/<?php echo $equipement['id']; ?>" 
+                                                       class="btn btn-sm btn-primary me-2">
+                                                        <i class="fas fa-cog"></i> Générer config
+                                                    </a>
+                                                    <form action="/projet-pfe-v1/projet-t1/public/workorder/desaffecter-equipement" method="POST" style="display:inline;">
+                                                        <input type="hidden" name="work_order_id" value="<?php echo $workorder['id']; ?>">
+                                                        <input type="hidden" name="equipement_id" value="<?php echo $equipement['id']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir désaffecter cet équipement ?');">
+                                                            <i class="fas fa-unlink"></i> Désaffecter
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted">Aucun équipement affecté à ce work order.</p>
+                        <?php endif; ?>
+
+                        <!-- Formulaire d'affectation d'équipement -->
+                        <?php if (!empty($equipementsDisponibles)): ?>
+                            <div class="mt-4">
+                                <h6>Affecter un nouvel équipement</h6>
+                                <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-equipement" method="POST" class="row g-3">
+                                    <input type="hidden" name="work_order_id" value="<?php echo $workorder['id']; ?>">
+                                    <div class="col-md-8">
+                                        <select name="equipement_id" class="form-select" required>
+                                            <option value="">Sélectionner un équipement</option>
+                                            <?php foreach ($equipementsDisponibles as $equipement): ?>
+                                                <option value="<?php echo $equipement['id']; ?>">
+                                                    <?php echo htmlspecialchars($equipement['marque'] . ' - ' . $equipement['modele'] . ' (' . $equipement['numero_serie'] . ')'); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Affecter
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted mt-4">Aucun équipement disponible pour l'affectation.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         </main>
     </div>

@@ -61,20 +61,29 @@ function disponibilite_label($status) {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Type</th>
+                            <th>Marque</th>
                             <th>Modèle</th>
                             <th>Capacité</th>
                             <th>Disponibilité</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($equipements as $equipement): ?>
+                        <?php foreach (
+                            isset($equipements) ? $equipements : [] as $equipement): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($equipement['id']); ?></td>
-                            <td><?php echo htmlspecialchars($equipement['type']); ?></td>
+                            <td><?php echo htmlspecialchars($equipement['marque']); ?></td>
                             <td><?php echo htmlspecialchars($equipement['modele']); ?></td>
                             <td><?php echo htmlspecialchars($equipement['capacite']); ?></td>
-                            <td><?php echo $equipement['disponibilite'] ? '<span style=\'background:#ffd700;color:#000;padding:5px 10px;border-radius:15px;font-size:0.8rem;\'>Disponible</span>' : '<span style=\'background:#eee;color:#888;padding:5px 10px;border-radius:15px;font-size:0.8rem;\'>Indisponible</span>'; ?></td>
+                            <td>
+                                <?php
+                                if ($equipement['statut'] === 'disponible') {
+                                    echo "<span style='background:#ffd700;color:#000;padding:5px 10px;border-radius:15px;font-size:0.8rem;'>Disponible</span>";
+                                } else {
+                                    echo "<span style='background:#eee;color:#888;padding:5px 10px;border-radius:15px;font-size:0.8rem;'>" . htmlspecialchars($equipement['statut']) . "</span>";
+                                }
+                                ?>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
