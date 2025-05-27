@@ -73,6 +73,16 @@ if (!$workorder) {
         <!-- Main Content -->
         <main class="main-content">
             <div class="dashboard-content">
+                <?php 
+                    if (isset($_SESSION['success'])) {
+                        echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['success']) . '</div>';
+                        unset($_SESSION['success']);
+                    }
+                    if (isset($_SESSION['error'])) {
+                        echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['error']) . '</div>';
+                        unset($_SESSION['error']);
+                    }
+                ?>
                 <div class="workorder-detail-card">
                     <h2>Work Order <?php echo htmlspecialchars($workorder['numero']); ?></h2>
                     <ul class="workorder-detail-list">
@@ -80,6 +90,33 @@ if (!$workorder) {
                         <li><span class="workorder-detail-label">Technologie :</span> <?php echo htmlspecialchars($workorder['technology']); ?></li>
                         <li><span class="workorder-detail-label">Offre :</span> <?php echo htmlspecialchars($workorder['offre']); ?></li>
                         <li><span class="workorder-detail-label">Date :</span> <?php echo htmlspecialchars($workorder['date']); ?></li>
+                        <li><span class="workorder-detail-label">Statut :</span> 
+                            <?php 
+                                function statut_label_detail($status) { // Définir la fonction localement ou l'importer
+                                    switch ($status) {
+                                        case '1': return '<span style="color: blue;">En Attente</span>'; // Adaptez le style
+                                        case '2': return '<span style="color: orange;">En Cours</span>'; // Adaptez le style
+                                        case '3': return '<span style="color: green;">Terminé</span>'; // Adaptez le style
+                                        default: return htmlspecialchars($status);
+                                    }
+                                }
+                                echo statut_label_detail($workorder['status']); 
+                            ?>
+                        </li>
+                        <?php if (!empty($workorder['user_id'])): // Afficher l'utilisateur affecté si défini ?>
+                            <li><span class="workorder-detail-label">Affecté à :</span> 
+                                <?php 
+                                    // Récupérer le nom d'utilisateur affecté si ce n'est pas déjà fait
+                                    // Dans ce cas, comme nous sommes sur la page de détail, il faut peut-être
+                                    // une méthode getById avec jointure ou une méthode pour récupérer l'utilisateur par ID
+                                    // Pour l'instant, je suppose que $workorder pourrait contenir assigned_username si getById est modifiée,
+                                    // sinon il faudrait récupérer l'utilisateur ici.
+                                    // En attendant, j'affiche juste l'ID ou un placeholder.
+                                    // TODO: Récupérer et afficher le nom d'utilisateur affecté réel ici.
+                                    echo htmlspecialchars($workorder['user_id'] ?? 'N/A');
+                                ?>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                     <div class="workorder-description">
                         <strong>Description :</strong><br>
@@ -116,7 +153,7 @@ if (!$workorder) {
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <a href="/projet-pfe-v1/projet-t1/public/configuration/generer/<?php echo $equipement['id']; ?>" 
+                                                    <a href="/projet-pfe-v1/projet-t1/public/configuration/<?php echo $equipement['id']; ?>" 
                                                        class="btn btn-sm btn-primary me-2">
                                                         <i class="fas fa-cog"></i> Générer config
                                                     </a>
@@ -165,6 +202,20 @@ if (!$workorder) {
                         <?php endif; ?>
                     </div>
                 </div>
+                <!-- Bouton Terminer le Work Order -->
+                <?php 
+                    // Afficher le bouton Terminer si l'utilisateur est affecté ou admin, et le WO n'est pas Terminé
+                    if (($workorder['user_id'] == $userId || $userRole === 'admin') && $workorder['status'] !== '3'): 
+                ?>
+                <div class="mt-4 text-center">
+                    <form action="/projet-pfe-v1/projet-t1/public/workorder/complete" method="POST">
+                        <input type="hidden" name="work_order_id" value="<?php echo htmlspecialchars($workorder['id']); ?>">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle"></i> Terminer le Work Order
+                        </button>
+                    </form>
+                </div>
+                <?php endif; ?>
             </div>
         </main>
     </div>

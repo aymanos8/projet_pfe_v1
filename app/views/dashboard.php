@@ -59,14 +59,21 @@ function tech_label($tech) {
                 <div class="profile" id="profile-menu">
                     <!-- <img src="https://via.placeholder.com/40" alt="Profile"> -->
                     <div class="profile-info">
-                        <span class="name"></span>
-                        <span class="role">Administrateur</span>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <span class="name"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Utilisateur'); ?></span>
+                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? '')); ?></span>
+                        <?php else: ?>
+                            <span class="name">Invité</span>
+                            <span class="role">Non connecté</span>
+                        <?php endif; ?>
                     </div>
                     <div class="dropdown-menu">
                         <div class="dropdown-title">Mon compte</div>
                         <div class="dropdown-item">Profil</div>
                         <div class="dropdown-item">Préférences</div>
-                        <div class="dropdown-item">Se déconnecter</div>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <a href="/projet-pfe-v1/projet-t1/public/logout" class="dropdown-item logout-item">Se déconnecter</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </header>

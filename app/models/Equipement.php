@@ -25,15 +25,15 @@ class Equipement {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addEquipement($modele, $marque, $type_interfaces, $capacite, $numero_serie) {
-        $query = "INSERT INTO equipements_reseau (modele, marque, type_interfaces, capacite, numero_serie) 
-                 VALUES (:modele, :marque, :type_interfaces, :capacite, :numero_serie)";
+    public function addEquipement($modele, $marque, $type_interfaces, $gamme, $numero_serie) {
+        $query = "INSERT INTO equipements_reseau (modele, marque, type_interfaces, gamme, numero_serie) 
+                 VALUES (:modele, :marque, :type_interfaces, :gamme, :numero_serie)";
         $stmt = $this->db->prepare($query);
         return $stmt->execute([
             'modele' => $modele,
             'marque' => $marque,
             'type_interfaces' => $type_interfaces,
-            'capacite' => $capacite,
+            'gamme' => $gamme,
             'numero_serie' => $numero_serie
         ]);
     }
@@ -43,7 +43,7 @@ class Equipement {
                  modele = :modele,
                  marque = :marque,
                  type_interfaces = :type_interfaces,
-                 capacite = :capacite,
+                 gamme = :gamme,
                  statut = :statut,
                  numero_serie = :numero_serie
                  WHERE id = :id";
@@ -97,7 +97,7 @@ class Equipement {
         // Logique de sélection d'équipement compatible
         $query = "SELECT * FROM equipements_reseau 
                  WHERE statut = 'disponible' 
-                 AND (type_interfaces LIKE :technology OR capacite LIKE :offre)
+                 AND (type_interfaces LIKE :technology OR gamme LIKE :offre)
                  ORDER BY date_ajout ASC
                  LIMIT 1";
         

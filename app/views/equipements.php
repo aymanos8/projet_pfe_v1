@@ -63,7 +63,7 @@ function disponibilite_label($status) {
                             <th>ID</th>
                             <th>Marque</th>
                             <th>Modèle</th>
-                            <th>Capacité</th>
+                            <th>Gamme</th>
                             <th>Disponibilité</th>
                         </tr>
                     </thead>
@@ -74,7 +74,7 @@ function disponibilite_label($status) {
                             <td><?php echo htmlspecialchars($equipement['id']); ?></td>
                             <td><?php echo htmlspecialchars($equipement['marque']); ?></td>
                             <td><?php echo htmlspecialchars($equipement['modele']); ?></td>
-                            <td><?php echo htmlspecialchars($equipement['capacite']); ?></td>
+                            <td><?php echo htmlspecialchars($equipement['gamme']); ?></td>
                             <td>
                                 <?php
                                 if ($equipement['statut'] === 'disponible') {

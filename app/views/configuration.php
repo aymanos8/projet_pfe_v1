@@ -50,46 +50,63 @@
                 </div>
             </header>
             <section class="content-section" style="max-width:1100px;margin:32px auto 0 auto;">
+                <?php
+                if (isset($_SESSION['error'])) {
+                    $errorMessage = str_replace('<br>', ' ', $_SESSION['error']);
+                    echo '<div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 16px; border-radius: 8px; margin: 0 auto 24px auto; border: 1px solid #f5c6cb; max-width: 900px; font-weight: 500; display: flex; align-items: center; gap: 10px;">';
+                    echo '<i class="fas fa-exclamation-circle" style="font-size: 1.2em;"></i>';
+                    echo htmlspecialchars($errorMessage);
+                    echo '</div>';
+                    unset($_SESSION['error']);
+                }
+                ?>
                 <div class="form-card" style="background:#fff;box-shadow:0 2px 12px rgba(30,40,90,0.07);border-radius:16px;padding:40px 32px 32px 32px;max-width:900px;margin:auto;">
                     <h1 class="form-title" style="font-size:2rem;font-weight:700;margin-bottom:32px;display:flex;align-items:center;gap:12px;"><i class="fas fa-cogs"></i> Générateur de configuration Cisco</h1>
                     <form action="/projet-pfe-v1/projet-t1/public/configuration/generer" method="post" id="ciscoForm">
                         <div class="form-row" style="display: flex; gap: 48px; flex-wrap: wrap; align-items: flex-start;">
                             <div class="form-col" style="flex:1; min-width:320px;">
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">Nom du routeur</label>
-                                    <input type="text" name="ROUTER_HOSTNAME" id="ROUTER_HOSTNAME" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">Nom du routeur <span style="color: red;">*</span></label>
+                                    <input type="text" name="ROUTER_HOSTNAME" id="ROUTER_HOSTNAME" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;"
+                                           value="<?php echo htmlspecialchars($equipement['modele'] ?? $formData['ROUTER_HOSTNAME'] ?? ''); ?>"
+                                           required
+                                    >
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">Utilisateur admin</label>
-                                    <input type="text" name="ADMIN_USER" id="ADMIN_USER" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">Utilisateur admin <span style="color: red;">*</span></label>
+                                    <input type="text" name="ADMIN_USER" id="ADMIN_USER" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['ADMIN_USER'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">Mot de passe admin</label>
-                                    <input type="text" name="ADMIN_PASS" id="ADMIN_PASS" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">Mot de passe admin <span style="color: red;">*</span></label>
+                                    <input type="text" name="ADMIN_PASS" id="ADMIN_PASS" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['ADMIN_PASS'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">Interface management</label>
-                                    <input type="text" name="INTERFACE_MGMT" id="INTERFACE_MGMT" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">Interface management <span style="color: red;">*</span></label>
+                                    <input type="text" name="INTERFACE_MGMT" id="INTERFACE_MGMT" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['INTERFACE_MGMT'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">Gateway management</label>
-                                    <input type="text" name="GATEWAY_MGMT" id="GATEWAY_MGMT" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">Gateway management <span style="color: red;">*</span></label>
+                                    <input type="text" name="GATEWAY_MGMT" id="GATEWAY_MGMT" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['GATEWAY_MGMT'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">MGMT1</label>
-                                    <input type="text" name="MGMT1" id="MGMT1" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">Masque WAN <span style="color: red;">*</span></label>
+                                    <input type="text" name="WAN_MASK" id="WAN_MASK" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required oninput="calculerWildcard()" value="<?php echo htmlspecialchars($formData['WAN_MASK'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">MGMT2</label>
-                                    <input type="text" name="MGMT2" id="MGMT2" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">MGMT1 <span style="color: red;">*</span></label>
+                                    <input type="text" name="MGMT1" id="MGMT1" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['MGMT1'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">MGMT3</label>
-                                    <input type="text" name="MGMT3" id="MGMT3" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">MGMT2 <span style="color: red;">*</span></label>
+                                    <input type="text" name="MGMT2" id="MGMT2" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['MGMT2'] ?? ''); ?>">
                                 </div>
                                 <div class="form-group" style="margin-bottom:20px;">
-                                    <label style="font-weight:500;">WILDWARD</label>
-                                    <input type="text" name="WILDWARD" id="WILDWARD" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;">
+                                    <label style="font-weight:500;">MGMT3 <span style="color: red;">*</span></label>
+                                    <input type="text" name="MGMT3" id="MGMT3" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px;" required value="<?php echo htmlspecialchars($formData['MGMT3'] ?? ''); ?>">
+                                </div>
+                                <div class="form-group" style="margin-bottom:20px;">
+                                    <label style="font-weight:500;">WILDWARD <span style="color: red;">*</span></label>
+                                    <input type="text" name="WILDWARD" id="WILDWARD" class="input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d1d5db;margin-top:6px; background-color: #f3f4f6;" required readonly value="<?php echo htmlspecialchars($formData['WILDWARD'] ?? ''); ?>">
                                 </div>
                             </div>
                             <div class="form-col" style="flex:1; min-width:320px; max-width:480px;">
@@ -167,16 +184,19 @@
         document.getElementById('ADMIN_USER').value = "admin";
         document.getElementById('ADMIN_PASS').value = "Admin@123";
         document.getElementById('INTERFACE_MGMT').value = "Vlan37";
-        document.getElementById('GATEWAY_MGMT').value = "10.0.1.2";
-        document.getElementById('MGMT1').value = "10.104.70.55";
-        document.getElementById('MGMT2').value = "10.104.70.65";
-        document.getElementById('MGMT3').value = "10.104.70.53";
+        document.getElementById('GATEWAY_MGMT').value = "172.23.64.1";
+        document.getElementById('WAN_MASK').value = "255.255.255.0";
+        document.getElementById('MGMT1').value = "172.23.34.1";
+        document.getElementById('MGMT2').value = "172.23.34.2";
+        document.getElementById('MGMT3').value = "172.23.34.3";
         document.getElementById('WILDWARD').value = "0.0.0.255";
-        // Ajoute des interfaces dynamiques d'exemple
+        
+        calculerWildcard();
+        
         document.getElementById('interfaces').innerHTML = '';
         interfaceIndex = 0;
         const interfaces = [
-            { nom: "GigabitEthernet0/2", desc: "WAN", ip: "10.0.1.1", mask: "255.255.255.252" },
+            { nom: "GigabitEthernet0/2", desc: "WAN", ip: "172.23.34.0", mask: "255.255.255.0" },
             { nom: "GigabitEthernet0/3", desc: "LAN", ip: "192.168.10.1", mask: "255.255.255.0" }
         ];
         interfaces.forEach((iface, idx) => {
@@ -186,7 +206,7 @@
             document.querySelector(`input[name='INTERFACES[${idx}][LAN_IP]']`).value = iface.ip;
             document.querySelector(`input[name='INTERFACES[${idx}][LAN_MASK]']`).value = iface.mask;
         });
-        // Ajoute des ACL dynamiques d'exemple
+
         document.getElementById('acls').innerHTML = '';
         aclIndex = 0;
         const acls = [
@@ -207,6 +227,56 @@
         btn.innerHTML = '<i class="fas fa-check"></i> Copié!';
         setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copier'; }, 1500);
     }
+
+    const wildcardTable = {
+        "255.255.255.255": "0.0.0.0",
+        "255.255.255.254": "0.0.0.1",
+        "255.255.255.252": "0.0.0.3",
+        "255.255.255.248": "0.0.0.7",
+        "255.255.255.240": "0.0.0.15",
+        "255.255.255.224": "0.0.0.31",
+        "255.255.255.192": "0.0.0.63",
+        "255.255.255.128": "0.0.0.127",
+        "255.255.255.0": "0.0.0.255",
+        "255.255.254.0": "0.0.1.255",
+        "255.255.252.0": "0.0.3.255",
+        "255.255.248.0": "0.0.7.255",
+        "255.255.240.0": "0.0.15.255",
+        "255.255.224.0": "0.0.31.255",
+        "255.255.192.0": "0.0.63.255",
+        "255.255.128.0": "0.0.127.255",
+        "255.255.0.0": "0.0.255.255",
+        "255.254.0.0": "0.1.255.255",
+        "255.252.0.0": "0.3.255.255",
+        "255.248.0.0": "0.7.255.255",
+        "255.240.0.0": "0.15.255.255",
+        "255.224.0.0": "0.31.255.255",
+        "255.192.0.0": "0.63.255.255",
+        "255.128.0.0": "0.127.255.255",
+        "255.0.0.0": "0.255.255.255",
+        "254.0.0.0": "1.255.255.255",
+        "252.0.0.0": "3.255.255.255",
+        "248.0.0.0": "7.255.255.255",
+        "240.0.0.0": "15.255.255.255",
+        "224.0.0.0": "31.255.255.255",
+        "192.0.0.0": "63.255.255.255",
+        "128.0.0.0": "127.255.255.255",
+        "0.0.0.0": "255.255.255.255"
+    };
+
+    function calculerWildcard() {
+        const wanMaskInput = document.getElementById('WAN_MASK');
+        const wildcardInput = document.getElementById('WILDWARD');
+        const wanMaskValue = wanMaskInput.value.trim();
+
+        if (wildcardTable[wanMaskValue]) {
+            wildcardInput.value = wildcardTable[wanMaskValue];
+        } else {
+            wildcardInput.value = '';
+        }
+    }
+
+    calculerWildcard();
     </script>
 </body>
 </html> 

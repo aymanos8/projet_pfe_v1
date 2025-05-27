@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../controllers/DashboardController.php';
-$controller = new DashboardController();
-$workOrders = $controller->getWorkOrders();
+// require_once __DIR__ . '/../controllers/DashboardController.php';
+// $controller = new DashboardController();
+// $workOrders = $controller->getWorkOrders();
 
 function statut_label($status) {
     switch ($status) {
@@ -57,12 +57,30 @@ function tech_label($tech) {
                 </div>
                 <div class="profile" id="profile-menu">
                     <div class="profile-info">
-                        <span class="name"></span>
-                        <span class="role">Administrateur</span>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <span class="name"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Utilisateur'); ?></span>
+                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? '')); ?></span>
+                        <?php else: ?>
+                            <span class="name">Invité</span>
+                            <span class="role">Non connecté</span>
+                        <?php endif; ?>
                     </div>
+                     <?php if (AuthController::isLoggedIn()): ?>
+                        <a href="/projet-pfe-v1/projet-t1/public/logout" class="logout-link">Déconnexion</a>
+                    <?php endif; ?>
                 </div>
             </header>
             <div class="dashboard-content">
+                <?php 
+                    if (isset($_SESSION['success'])) {
+                        echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['success']) . '</div>';
+                        unset($_SESSION['success']);
+                    }
+                    if (isset($_SESSION['error'])) {
+                        echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['error']) . '</div>';
+                        unset($_SESSION['error']);
+                    }
+                ?>
                 <div class="work-orders">
                     <h2>Tous les Work Orders</h2>
                     <table id="all-work-orders-table">
@@ -76,6 +94,9 @@ function tech_label($tech) {
                                 <th>État</th>
                                 <th>Date de création</th>
                                 <th>Détail</th>
+                                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                                    <th>Affecter à</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -91,6 +112,50 @@ function tech_label($tech) {
                                 <td>
                                     <a class="btn-link" href="/projet-pfe-v1/projet-t1/public/workorder_detail/<?php echo urlencode($wo['id']); ?>">Voir détail</a>
                                 </td>
+                                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                                    <td>
+                                        <?php if (!empty($wo['user_id'])): ?>
+                                            <div class="assignment-display" id="assignment-display-<?php echo htmlspecialchars($wo['id']); ?>">
+                                                <?php echo htmlspecialchars($wo['assigned_username'] ?? 'N/A'); ?>
+                                                <button type="button" class="btn-edit-assignment" data-workorder-id="<?php echo htmlspecialchars($wo['id']); ?>">Modifier</button>
+                                            </div>
+                                            <div class="assignment-form" id="assignment-form-<?php echo htmlspecialchars($wo['id']); ?>" style="display: none;">
+                                                <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-utilisateur" method="POST">
+                                                    <input type="hidden" name="work_order_id" value="<?php echo htmlspecialchars($wo['id']); ?>">
+                                                    <select name="user_id">
+                                                        <option value="">-- Sélectionner un utilisateur --</option>
+                                                        <?php foreach ($users as $user): ?>
+                                                            <option value="<?php echo htmlspecialchars($user['id']); ?>"
+                                                                    <?php echo (!empty($wo['user_id']) && $wo['user_id'] == $user['id']) ? 'selected' : ''; ?>>
+                                                            <?php echo htmlspecialchars($user['username']); ?>
+                                                        </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <button type="submit">Affecter</button>
+                                                </form>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="assignment-display" id="assignment-display-<?php echo htmlspecialchars($wo['id']); ?>" style="display: none;">
+                                                <?php echo htmlspecialchars($wo['assigned_username'] ?? 'N/A'); ?>
+                                                <button type="button" class="btn-edit-assignment" data-workorder-id="<?php echo htmlspecialchars($wo['id']); ?>">Modifier</button>
+                                            </div>
+                                            <div class="assignment-form" id="assignment-form-<?php echo htmlspecialchars($wo['id']); ?>">
+                                                <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-utilisateur" method="POST">
+                                                    <input type="hidden" name="work_order_id" value="<?php echo htmlspecialchars($wo['id']); ?>">
+                                                    <select name="user_id">
+                                                        <option value="">-- Sélectionner un utilisateur --</option>
+                                                        <?php foreach ($users as $user): ?>
+                                                            <option value="<?php echo htmlspecialchars($user['id']); ?>">
+                                                                <?php echo htmlspecialchars($user['username']); ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <button type="submit">Affecter</button>
+                                                </form>
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -100,5 +165,21 @@ function tech_label($tech) {
         </main>
     </div>
     <script src="/projet-pfe-v1/projet-t1/public/assets/js/all_workorders.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-edit-assignment').forEach(button => {
+                button.addEventListener('click', function() {
+                    const workOrderId = this.getAttribute('data-workorder-id');
+                    const displayDiv = document.getElementById(`assignment-display-${workOrderId}`);
+                    const formDiv = document.getElementById(`assignment-form-${workOrderId}`);
+                    
+                    if (displayDiv && formDiv) {
+                        displayDiv.style.display = 'none';
+                        formDiv.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

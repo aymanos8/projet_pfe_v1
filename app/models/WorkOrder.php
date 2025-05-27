@@ -33,7 +33,12 @@ class WorkOrder
     public function getAll()
     {
         try {
-            $stmt = $this->cnx->query("SELECT * FROM `work-orders` ORDER BY date DESC");
+            // Jointure avec la table users pour récupérer le nom de l'utilisateur affecté
+            $query = "SELECT wo.*, u.username as assigned_username 
+                      FROM `work-orders` wo
+                      LEFT JOIN users u ON wo.user_id = u.id
+                      ORDER BY wo.date DESC";
+            $stmt = $this->cnx->query($query);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la récupération des work orders : " . $e->getMessage());
@@ -84,6 +89,63 @@ class WorkOrder
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la récupération du work order : " . $e->getMessage());
         }
+    }
+
+    /**
+     * Met à jour le statut d'un work order.
+     *
+     * @param int $workOrderId L'ID du work order.
+     * @param string $status Le nouveau statut (e.g., '1', '2', '3').
+     * @return bool Retourne true en cas de succès, false sinon.
+     */
+    public function updateStatus($workOrderId, $status) {
+        try {
+            $query = "UPDATE `work-orders` SET status = :status WHERE id = :work_order_id";
+            $stmt = $this->cnx->prepare($query);
+            return $stmt->execute([
+                'status' => $status,
+                'work_order_id' => $workOrderId
+            ]);
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la mise à jour du statut du work order : " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Affecte un work order à un utilisateur spécifique.
+     *
+     * @param int $workOrderId L'ID du work order.
+     * @param int $userId L'ID de l'utilisateur.
+     * @return bool Retourne true en cas de succès, false sinon.
+     */
+    public function affectUser($workOrderId, $userId) {
+        try {
+            // Mettre à jour le user_id et le statut à 'En Cours' (2)
+            $query = "UPDATE `work-orders` SET user_id = :user_id, status = '2' WHERE id = :work_order_id";
+            $stmt = $this->cnx->prepare($query);
+            return $stmt->execute([
+                'user_id' => $userId,
+                'work_order_id' => $workOrderId
+            ]);
+        } catch (PDOException $e) {
+            // Gérer l'erreur ou la logguer
+            error_log("Erreur lors de l'affectation du work order à l'utilisateur : " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Récupère tous les work orders affectés à un utilisateur spécifique.
+     *
+     * @param int $userId L'ID de l'utilisateur.
+     * @return array Retourne un tableau des work orders affectés.
+     */
+    public function getByUserId($userId) {
+        $query = "SELECT * FROM `work-orders` WHERE user_id = :user_id ORDER BY date DESC";
+        $stmt = $this->cnx->prepare($query);
+        $stmt->execute(['user_id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>

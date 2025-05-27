@@ -45,14 +45,7 @@ username {{ADMIN_USER}} privilege 15 password {{ADMIN_PASS}}
 ! ======================================================
 !              INTERFACES & IP ADDRESSING
 ! ======================================================
-interface {{INTERFACE_MGMT}}
- description Interface Management
- ip address 10.0.0.1 255.255.255.255
-!
-interface GigabitEthernet0/1
- description LAN
- ip address 192.168.1.1 255.255.255.0
-!
+
 {% for iface in INTERFACES %}
 interface {{ iface.NOM_INTERFACE }}
  description {{ iface.DESCRIPTION }}

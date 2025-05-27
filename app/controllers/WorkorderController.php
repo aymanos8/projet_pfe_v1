@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../models/WorkOrder.php';
 require_once __DIR__ . '/../models/Equipement.php';
 require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/AuthController.php'; // Assurez-vous que AuthController est chargé
+require_once __DIR__ . '/../models/Utilisateur.php'; // Inclure le modèle Utilisateur
 
 class WorkorderController {
     public function syncWorkOrders() {
@@ -110,6 +112,35 @@ class WorkorderController {
     }
 
     public function index() {
+        require_once __DIR__ . '/../core/Database.php';
+        require_once __DIR__ . '/../models/WorkOrder.php';
+        require_once __DIR__ . '/AuthController.php';
+        require_once __DIR__ . '/../models/Utilisateur.php'; // Inclure le modèle Utilisateur
+
+        $cnx = Database::getInstance()->getConnection();
+        $workOrderModel = new WorkOrder($cnx);
+        $userModel = new Utilisateur($cnx); // Instancier le modèle Utilisateur
+
+        $users = []; // Initialiser le tableau des utilisateurs
+
+        if (AuthController::isLoggedIn()) {
+            $userRole = AuthController::getUserRole();
+            $userId = AuthController::getUserId();
+
+            if ($userRole === 'admin') {
+                // L'admin voit tous les work orders
+                $workOrders = $workOrderModel->getAll();
+                // Récupérer tous les utilisateurs pour l'admin
+                $users = $userModel->getAllUsersOnly();
+            } else {
+                // Un utilisateur classique ne voit que ses work orders affectés
+                $workOrders = $workOrderModel->getByUserId($userId);
+            }
+        } else {
+            // Si non connecté, afficher une page vide ou rediriger
+            $workOrders = [];
+        }
+
         require __DIR__ . '/../views/all_workorders.php';
     }
 
@@ -122,6 +153,10 @@ class WorkorderController {
         $equipements = $equipementModel->getEquipementsByWorkOrder($id);
         $equipementsDisponibles = $equipementModel->getEquipementsDisponibles();
         
+        // Passer l'ID et le rôle de l'utilisateur connecté à la vue
+        $userId = AuthController::getUserId();
+        $userRole = AuthController::getUserRole();
+
         require __DIR__ . '/../views/workorder_detail.php';
     }
 
@@ -192,6 +227,96 @@ class WorkorderController {
             }
 
             header('Location: /projet-pfe-v1/projet-t1/public/workorder_detail/' . $work_order_id);
+            exit;
+        }
+    }
+
+    // Nouvelle méthode pour affecter un work order à un utilisateur
+    public function affecterWorkOrder() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $work_order_id = $_POST['work_order_id'] ?? null;
+            $user_id = $_POST['user_id'] ?? null;
+
+            // Vérifier que l'utilisateur connecté est un admin
+            if (!AuthController::isLoggedIn() || AuthController::getUserRole() !== 'admin') {
+                $_SESSION['error'] = "Accès non autorisé.";
+                header('Location: /projet-pfe-v1/projet-t1/public/workorders');
+                exit;
+            }
+
+            if (!$work_order_id || !$user_id) {
+                $_SESSION['error'] = "Données manquantes pour l'affectation du work order.";
+                header('Location: /projet-pfe-v1/projet-t1/public/workorders');
+                exit;
+            }
+
+            $cnx = Database::getInstance()->getConnection();
+            $workOrderModel = new WorkOrder($cnx);
+
+            // Appeler une nouvelle méthode dans le modèle WorkOrder pour affecter l'utilisateur
+            if ($workOrderModel->affectUser($work_order_id, $user_id)) {
+                $_SESSION['success'] = "Work order affecté à l'utilisateur avec succès.";
+            } else {
+                $_SESSION['error'] = "Erreur lors de l'affectation du work order à l'utilisateur.";
+            }
+
+            // Recharger les work orders et afficher la vue (similaire à la méthode index)
+            $userModel = new Utilisateur($cnx); // Instancier le modèle Utilisateur si ce n'est pas déjà fait
+            $users = $userModel->getAllUsersOnly(); // Récupérer la liste des utilisateurs pour la vue
+
+            // Récupérer les work orders (filtrés ou tous, selon le rôle de l'utilisateur connecté)
+            $userRole = AuthController::getUserRole();
+            $userId = AuthController::getUserId();
+
+            if ($userRole === 'admin') {
+                $workOrders = $workOrderModel->getAll();
+            } else {
+                $workOrders = $workOrderModel->getByUserId($userId);
+            }
+
+            require __DIR__ . '/../views/all_workorders.php';
+        }
+    }
+
+    // Nouvelle méthode pour marquer un work order comme terminé
+    public function completeWorkOrder() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $work_order_id = $_POST['work_order_id'] ?? null;
+
+            if (!$work_order_id) {
+                $_SESSION['error'] = "ID du work order manquant pour terminer.";
+                header('Location: /projet-pfe-v1/projet-t1/public/workorders'); // Rediriger vers la liste ou la page de détail
+                exit;
+            }
+
+            $cnx = Database::getInstance()->getConnection();
+            $workOrderModel = new WorkOrder($cnx);
+            
+            // Vérifier si l'utilisateur connecté est l'affecté ou un admin
+            $workorder = $workOrderModel->getById($work_order_id);
+            $userId = AuthController::getUserId();
+            $userRole = AuthController::getUserRole();
+
+            if ($workorder && ($workorder['user_id'] == $userId || $userRole === 'admin')) {
+                // Mettre à jour le statut à 'Terminé' (3)
+                if ($workOrderModel->updateStatus($work_order_id, '3')) {
+                    // Mettre également à jour le statut des équipements associés à 'en_stock' si nécessaire (selon la logique métier)
+                    // ... (logique pour les équipements si applicable)
+
+                    $_SESSION['success'] = "Work order marqué comme terminé.";
+                } else {
+                    $_SESSION['error'] = "Erreur lors de la mise à jour du statut du work order.";
+                }
+            } else {
+                $_SESSION['error'] = "Vous n'êtes pas autorisé à terminer ce work order.";
+            }
+            
+            // Rediriger vers la page de détail du work order ou la liste
+            if ($work_order_id) {
+                 header('Location: /projet-pfe-v1/projet-t1/public/workorder_detail/' . $work_order_id);
+            } else {
+                 header('Location: /projet-pfe-v1/projet-t1/public/workorders');
+            }
             exit;
         }
     }
