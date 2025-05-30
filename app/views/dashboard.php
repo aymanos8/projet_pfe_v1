@@ -1,8 +1,9 @@
 <?php
-require_once __DIR__ . '/../controllers/DashboardController.php';
-$controller = new DashboardController();
-$workOrders = array_slice($controller->getWorkOrders(), 0, 3); // Limite à 3 derniers
-$stats = $controller->getStatistics();
+// Les variables $workOrders et $stats sont passées par le contrôleur
+// require_once __DIR__ . '/../controllers/DashboardController.php';
+// $controller = new DashboardController();
+// $workOrders = array_slice($controller->getWorkOrders(), 0, 3); // Limite à 3 derniers
+// $stats = $controller->getStatistics();
 
 function statut_label($status) {
     switch ($status) {
@@ -40,7 +41,9 @@ function tech_label($tech) {
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
                 <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
-                <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                    <li><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php endif; ?>
             </ul>
             <div class="sidebar-footer">
                 <li><i class="fas fa-cog"></i> Paramètres</li>
@@ -139,7 +142,11 @@ function tech_label($tech) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($workOrders as $wo): ?>
+                            <?php
+                            // Limiter le tableau $workOrders aux 3 premiers éléments pour l'affichage récent
+                            $workOrders = array_slice($workOrders, 0, 3);
+                            foreach ($workOrders as $wo):
+                            ?>
                             <tr data-status="<?php echo $wo['status']; ?>" data-technology="<?php echo strtolower($wo['technology']); ?>">
                                 <td><?php echo htmlspecialchars($wo['numero']); ?></td>
                                 <td><?php echo htmlspecialchars($wo['client']); ?></td>
@@ -157,4 +164,8 @@ function tech_label($tech) {
     </div>
     <script src="/projet-pfe-v1/projet-t1/public/assets/js/dashboard.js"></script>
 </body>
-</html> 
+</html>
+<?php
+// Limiter le tableau $workOrders aux 3 premiers éléments pour l'affichage récent
+$workOrders = array_slice($workOrders, 0, 3);
+?> 

@@ -38,7 +38,8 @@ class WorkOrder
                       FROM `work-orders` wo
                       LEFT JOIN users u ON wo.user_id = u.id
                       ORDER BY wo.date DESC";
-            $stmt = $this->cnx->query($query);
+            $stmt = $this->cnx->prepare($query);
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la récupération des work orders : " . $e->getMessage());
@@ -48,8 +49,8 @@ class WorkOrder
     public function countByStatus($status)
     {
         try {
-            $stmt = $this->cnx->prepare("SELECT COUNT(*) as count FROM `work-orders` WHERE status = ?");
-            $stmt->execute([$status]);
+            $stmt = $this->cnx->prepare("SELECT COUNT(*) as count FROM `work-orders` WHERE status = :status");
+            $stmt->execute(['status' => $status]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result['count'];
         } catch (PDOException $e) {
@@ -60,7 +61,8 @@ class WorkOrder
     public function countAll()
     {
         try {
-            $stmt = $this->cnx->query("SELECT COUNT(*) as count FROM `work-orders`");
+            $stmt = $this->cnx->prepare("SELECT COUNT(*) as count FROM `work-orders`");
+            $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result['count'];
         } catch (PDOException $e) {
@@ -142,10 +144,54 @@ class WorkOrder
      * @return array Retourne un tableau des work orders affectés.
      */
     public function getByUserId($userId) {
-        $query = "SELECT * FROM `work-orders` WHERE user_id = :user_id ORDER BY date DESC";
+        $query = "SELECT wo.*, u.username as assigned_username 
+                  FROM `work-orders` wo
+                  LEFT JOIN users u ON wo.user_id = u.id
+                  WHERE wo.user_id = :user_id 
+                  ORDER BY date DESC";
         $stmt = $this->cnx->prepare($query);
         $stmt->execute(['user_id' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Compte les work orders par statut pour un utilisateur spécifique.
+     *
+     * @param string $status Le statut.
+     * @param int $userId L'ID de l'utilisateur.
+     * @return int Retourne le nombre de work orders.
+     */
+    public function countByStatusAndUserId($status, $userId) {
+        try {
+            $stmt = $this->cnx->prepare("SELECT COUNT(*) as count FROM `work-orders` WHERE status = :status AND user_id = :user_id");
+            $stmt->execute([
+                'status' => $status,
+                'user_id' => $userId
+            ]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'];
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors du comptage des work orders par statut et utilisateur : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Compte tous les work orders pour un utilisateur spécifique.
+     *
+     * @param int $userId L'ID de l'utilisateur.
+     * @return int Retourne le nombre total de work orders pour l'utilisateur.
+     */
+    public function countByUserId($userId) {
+        try {
+            $stmt = $this->cnx->prepare("SELECT COUNT(*) as count FROM `work-orders` WHERE user_id = :user_id");
+            $stmt->execute([
+                'user_id' => $userId
+            ]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'];
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors du comptage total des work orders par utilisateur : " . $e->getMessage());
+        }
     }
 }
 ?>

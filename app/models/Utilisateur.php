@@ -103,5 +103,17 @@ class Utilisateur {
         }
     }
 
+    public function countAll() {
+        try {
+            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM users");
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'];
+        } catch (PDOException $e) {
+            error_log("Erreur lors du comptage des utilisateurs : " . $e->getMessage());
+            return 0;
+        }
+    }
+
     // Vous pouvez ajouter ici d'autres méthodes comme createUser, updateUser, deleteUser, etc.
 } 

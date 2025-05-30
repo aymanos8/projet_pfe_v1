@@ -71,6 +71,9 @@ class AuthController {
                 $_SESSION['user_role'] = $user['role'];
                 $_SESSION['username'] = $user['username']; // Stocker aussi le username/email pour l'affichage
 
+                // Définir la variable is_admin dans la session
+                $_SESSION['is_admin'] = ($user['role'] === 'admin');
+
                 // Redirection selon le rôle
                 if ($user['role'] === 'admin') {
                     header('Location: /projet-pfe-v1/projet-t1/public/dashboard'); // Page admin

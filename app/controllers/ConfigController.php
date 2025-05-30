@@ -47,58 +47,49 @@ class ConfigController {
         $config = '';
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Store form data in session before validation
-            $_SESSION['form_data'] = $_POST;
+            $formData = $_POST;
+            $_SESSION['form_data'] = $formData;
 
-            // Vérification des champs requis
-            $champs_requis = [
-                'ROUTER_HOSTNAME',
-                'ADMIN_USER',
-                'ADMIN_PASS',
-                'INTERFACE_MGMT',
-                'GATEWAY_MGMT',
-                'WAN_MASK', // Added WAN_MASK to required fields
-                'MGMT1',
-                'MGMT2',
-                'MGMT3',
-                'WILDWARD'
+            // Validation des champs IP obligatoires
+            $ipFields = [
+                'GATEWAY_MGMT' => 'Gateway management',
+                'MGMT1' => 'MGMT1',
+                'MGMT2' => 'MGMT2',
+                'MGMT3' => 'MGMT3'
             ];
 
-            $champs_manquants = [];
-            foreach ($champs_requis as $champ) {
-                if (empty($_POST[$champ])) {
-                    $champs_manquants[] = $champ;
+            $errors = [];
+            foreach ($ipFields as $field => $label) {
+                if (!filter_var($formData[$field], FILTER_VALIDATE_IP)) {
+                    $errors[] = "Le format de $label n'est pas une adresse IP valide.";
                 }
             }
 
-            if (!empty($champs_manquants)) {
-                $_SESSION['error'] = "Veuillez remplir tous les champs obligatoires : " . implode(', ', $champs_manquants);
-                header('Location: /projet-pfe-v1/projet-t1/public/configuration');
-                exit();
+            // Validation des interfaces réseau dynamiques
+            if (isset($formData['INTERFACES']) && is_array($formData['INTERFACES'])) {
+                foreach ($formData['INTERFACES'] as $index => $interface) {
+                    if (!empty($interface['LAN_IP']) && !filter_var($interface['LAN_IP'], FILTER_VALIDATE_IP)) {
+                        $errors[] = "L'adresse IP de l'interface " . ($index + 1) . " n'est pas valide.";
+                    }
+                    if (!empty($interface['LAN_MASK']) && !filter_var($interface['LAN_MASK'], FILTER_VALIDATE_IP)) {
+                        $errors[] = "Le masque de l'interface " . ($index + 1) . " n'est pas valide.";
+                    }
+                }
             }
 
-            // Vérification du format des adresses IP (Simplifiée)
-            $champs_ip = [
-                'GATEWAY_MGMT',
-                'WAN_MASK',
-                'MGMT1',
-                'MGMT2',
-                'MGMT3',
-                'WILDWARD' // Inclure WILDWARD ici pour la validation simple
-            ];
-
-            $erreurs_format = [];
-            foreach ($champs_ip as $champ) {
-                 // Valider le format comme une adresse IP standard
-                 if (isset($_POST[$champ]) && !empty($_POST[$champ]) && !filter_var($_POST[$champ], FILTER_VALIDATE_IP)) {
-                      $erreurs_format[] = "Le format de " . $champ . " n'est pas une adresse IP valide.";
-                 }
+            // Validation des ACLs dynamiques
+            if (isset($formData['ACLS_DYN']) && is_array($formData['ACLS_DYN'])) {
+                foreach ($formData['ACLS_DYN'] as $index => $acl) {
+                    if (!empty($acl['value']) && !filter_var($acl['value'], FILTER_VALIDATE_IP)) {
+                        $errors[] = "La valeur de l'ACL " . ($index + 1) . " n'est pas une adresse IP valide.";
+                    }
+                }
             }
 
-            if (!empty($erreurs_format)) {
-                $_SESSION['error'] = ($_SESSION['error'] ?? '') . "<br>" . implode('<br>', $erreurs_format);
+            if (!empty($errors)) {
+                $_SESSION['error'] = implode(' ', $errors);
                 header('Location: /projet-pfe-v1/projet-t1/public/configuration');
-                exit();
+                exit;
             }
 
             try {

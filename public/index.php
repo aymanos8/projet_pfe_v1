@@ -9,6 +9,8 @@ require_once '../app/controllers/WorkorderController.php';
 require_once '../app/controllers/EquipementController.php';
 require_once '../app/controllers/DashboardController.php';
 require_once '../app/controllers/AuthController.php';
+require_once '../app/controllers/StatisticsController.php';
+// require_once '../app/config/config.php'; // Inclure le fichier de configuration
 
 $router = new Router();
 
@@ -39,6 +41,7 @@ $router->get('/workorder_detail/{id}', [WorkorderController::class, 'detail']);
 $router->get('/configuration', [ConfigController::class, 'index']);
 $router->get('/configuration/{id}', [ConfigController::class, 'index']);
 $router->get('/logout', [AuthController::class, 'logout']);
+$router->get('/statistics', [StatisticsController::class, 'index']);
 
 // Routes POST
 $router->post('/user/create', [ConfigController::class, 'create']);

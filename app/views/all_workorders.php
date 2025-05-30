@@ -40,7 +40,9 @@ function tech_label($tech) {
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
                 <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
-                <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                    <li><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php endif; ?>
             </ul>
             <div class="sidebar-footer">
                 <li><i class="fas fa-cog"></i> Paramètres</li>
@@ -107,53 +109,41 @@ function tech_label($tech) {
                                 <td><?php echo htmlspecialchars($wo['client']); ?></td>
                                 <td><?php echo tech_label($wo['technology']); ?></td>
                                 <td><?php echo htmlspecialchars($wo['offre']); ?></td>
-                                <td><?php echo statut_label($wo['status']); ?></td>
+                                <td style="min-width: 120px;"><?php echo statut_label($wo['status']); ?></td>
                                 <td><?php echo date('j F Y', strtotime($wo['date'])); ?></td>
                                 <td>
                                     <a class="btn-link" href="/projet-pfe-v1/projet-t1/public/workorder_detail/<?php echo urlencode($wo['id']); ?>">Voir détail</a>
                                 </td>
                                 <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
                                     <td>
-                                        <?php if (!empty($wo['user_id'])): ?>
-                                            <div class="assignment-display" id="assignment-display-<?php echo htmlspecialchars($wo['id']); ?>">
-                                                <?php echo htmlspecialchars($wo['assigned_username'] ?? 'N/A'); ?>
-                                                <button type="button" class="btn-edit-assignment" data-workorder-id="<?php echo htmlspecialchars($wo['id']); ?>">Modifier</button>
-                                            </div>
-                                            <div class="assignment-form" id="assignment-form-<?php echo htmlspecialchars($wo['id']); ?>" style="display: none;">
-                                                <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-utilisateur" method="POST">
-                                                    <input type="hidden" name="work_order_id" value="<?php echo htmlspecialchars($wo['id']); ?>">
-                                                    <select name="user_id">
-                                                        <option value="">-- Sélectionner un utilisateur --</option>
-                                                        <?php foreach ($users as $user): ?>
-                                                            <option value="<?php echo htmlspecialchars($user['id']); ?>"
-                                                                    <?php echo (!empty($wo['user_id']) && $wo['user_id'] == $user['id']) ? 'selected' : ''; ?>>
+                                        <?php
+                                            // Détermine si un utilisateur est affecté pour ce work order
+                                            $is_assigned = !empty($wo['user_id']);
+                                            // Détermine les classes CSS initiales pour l'affichage et le formulaire
+                                            $displayClass = $is_assigned ? 'show-flex' : 'hide-flex';
+                                            $formClass = $is_assigned ? 'hide-flex' : 'show-flex';
+                                        ?>
+                                        <!-- Div pour afficher le nom de l'utilisateur affecté et le bouton Modifier -->
+                                        <div class="assignment-display <?php echo $displayClass; ?>" id="assignment-display-<?php echo htmlspecialchars($wo['id']); ?>">
+                                            <?php echo htmlspecialchars($wo['assigned_username'] ?? 'N/A'); ?>
+                                            <button type="button" class="btn-edit-assignment" data-workorder-id="<?php echo htmlspecialchars($wo['id']); ?>">Modifier</button>
+                                        </div>
+                                        <!-- Div pour afficher le formulaire d'affectation -->
+                                        <div class="assignment-form <?php echo $formClass; ?>" id="assignment-form-<?php echo htmlspecialchars($wo['id']); ?>">
+                                            <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-utilisateur" method="POST">
+                                                <input type="hidden" name="work_order_id" value="<?php echo htmlspecialchars($wo['id']); ?>">
+                                                <select name="user_id">
+                                                    <option value="">-- Sélectionner un utilisateur --</option>
+                                                    <?php foreach ($users as $user): ?>
+                                                        <option value="<?php echo htmlspecialchars($user['id']); ?>"
+                                                                <?php echo ($is_assigned && $wo['user_id'] == $user['id']) ? 'selected' : ''; ?>>
                                                             <?php echo htmlspecialchars($user['username']); ?>
                                                         </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                    <button type="submit">Affecter</button>
-                                                </form>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="assignment-display" id="assignment-display-<?php echo htmlspecialchars($wo['id']); ?>" style="display: none;">
-                                                <?php echo htmlspecialchars($wo['assigned_username'] ?? 'N/A'); ?>
-                                                <button type="button" class="btn-edit-assignment" data-workorder-id="<?php echo htmlspecialchars($wo['id']); ?>">Modifier</button>
-                                            </div>
-                                            <div class="assignment-form" id="assignment-form-<?php echo htmlspecialchars($wo['id']); ?>">
-                                                <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-utilisateur" method="POST">
-                                                    <input type="hidden" name="work_order_id" value="<?php echo htmlspecialchars($wo['id']); ?>">
-                                                    <select name="user_id">
-                                                        <option value="">-- Sélectionner un utilisateur --</option>
-                                                        <?php foreach ($users as $user): ?>
-                                                            <option value="<?php echo htmlspecialchars($user['id']); ?>">
-                                                                <?php echo htmlspecialchars($user['username']); ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                    <button type="submit">Affecter</button>
-                                                </form>
-                                            </div>
-                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <button type="submit">Affecter</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 <?php endif; ?>
                             </tr>
@@ -174,8 +164,8 @@ function tech_label($tech) {
                     const formDiv = document.getElementById(`assignment-form-${workOrderId}`);
                     
                     if (displayDiv && formDiv) {
-                        displayDiv.style.display = 'none';
-                        formDiv.style.display = 'block';
+                        displayDiv.classList.replace('show-flex', 'hide-flex');
+                        formDiv.classList.replace('hide-flex', 'show-flex');
                     }
                 });
             });

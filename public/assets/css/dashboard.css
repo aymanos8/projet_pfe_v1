@@ -291,6 +291,41 @@ th {
     font-weight: 600;
 }
 
+/* Style pour la cellule de statut dans le tableau */
+td:nth-child(5) {
+    min-width: 100px; /* Ajustez cette valeur si nécessaire pour que le texte tienne sur une ligne */
+}
+
+/* Status Badge Styles */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px; /* Pour assurer une largeur minimale */
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+}
+
+.status-1 { /* En Attente */
+    background-color: #ffecb3; /* Jaune pâle */
+    color: #663c00; /* Texte marron foncé */
+    border: 1px solid #ffb300; /* Bordure jaune */
+}
+
+.status-2 { /* En Cours */
+    background-color: #bbdefb; /* Bleu pâle */
+    color: #0d47a1; /* Texte bleu foncé */
+    border: 1px solid #2196f3; /* Bordure bleue */
+}
+
+.status-3 { /* Terminé */
+    background-color: #c8e6c9; /* Vert pâle */
+    color: #1b5e20; /* Texte vert foncé */
+    border: 1px solid #4caf50; /* Bordure verte */
+}
+
 /* History Sidebar Styles */
 .history-sidebar {
     width: 300px;

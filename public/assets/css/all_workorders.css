@@ -58,6 +58,49 @@
     text-decoration: underline;
 }
 
+/* Styles pour la colonne Affecter à */
+#all-work-orders-table td:last-child {
+    /* Styles spécifiques pour la dernière colonne si nécessaire */
+}
+
+td .assignment-display {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espace entre le nom de l'utilisateur et le bouton */
+}
+
+td .assignment-form {
+    /* Styles pour le formulaire d'affectation si nécessaire */
+}
+
+/* Styles pour le bouton Modifier */
+#all-work-orders-table td .btn-edit-assignment {
+    padding: 2px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.2s;
+    vertical-align: middle;
+    margin: 0;
+    text-decoration: none; /* S'assurer qu'il n'y a pas de soulignement */
+    color: #333; /* Couleur de texte par défaut */
+}
+
+#all-work-orders-table td .btn-edit-assignment:hover {
+    background-color: #e0e0e0;
+}
+
+/* Classes de visibilité */
+.show-flex {
+    display: flex !important;
+}
+
+.hide-flex {
+    display: none !important;
+}
+
 @media (max-width: 900px) {
     .work-orders {
         padding: 10px;
