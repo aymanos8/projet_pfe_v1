@@ -1,0 +1,154 @@
+{# Template pour configuration FTTH - Voix (QoS) #}
+hostname {{ ROUTER_HOSTNAME }}
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 100000
+no logging console
+no logging monitor
+!
+
+! ======================================================
+!              AAA & AUTHENTIFICATION
+! ======================================================
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication login CONSOLE local group tacacs+
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default local group tacacs+ if-authenticated
+aaa authorization exec local_author local group tacacs+
+aaa authorization exec CONSOLE local group tacacs+ if-authenticated
+aaa authorization commands 1 local_author group tacacs+ local
+aaa authorization commands 4 default group tacacs+ local if-authenticated
+aaa authorization commands 15 default group tacacs+ local if-authenticated
+aaa session-id common
+ip tacacs source-interface {{ INTERFACE_MGMT }}
+tacacs-server host {{ TACACS_SERVER_1 }}
+tacacs-server host {{ TACACS_SERVER_2 }} single-connection timeout 1
+tacacs-server directed-request
+tacacs-server key {{ TACACS_KEY }}
+
+
+! ======================================================
+!              COMPTES & MOTS DE PASSE
+! ======================================================
+enable secret {{ ADMIN_PASS }}
+username {{ ADMIN_USER }} privilege 15 password {{ ADMIN_PASS }}
+
+! ======================================================
+!              INTERFACES & IP ADDRESSING
+! ======================================================
+
+{# Configuration de l'interface WAN FTTH (Exemple: GigabitEthernet0/1) #}
+interface {{ WAN_INTERFACE }}
+ description Liaison WAN FTTH - {{ CLIENT_NAME }}
+ no switchport
+ ip address {{ WAN_IP }} {{ WAN_MASK }}
+ no ip redirects
+ no ip proxy-arp
+ ip flow monitor {{ FLOW_MONITOR }} ingress
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+ service-policy output VOICE_POLICY
+!
+
+{% for iface in LAN_INTERFACES %}
+interface {{ iface.NOM_INTERFACE }}
+ description {{ iface.DESCRIPTION }}
+ ip address {{ iface.LAN_IP }} {{ iface.LAN_MASK }}
+!
+{% endfor %}
+
+! ======================================================
+!              SERVICES IP & SÉCURITÉ
+! ======================================================
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip forward-protocol nd
+
+ip ssh version 2
+
+! ======================================================
+!              ROUTAGE STATIQUE
+! ======================================================
+ip route 0.0.0.0 0.0.0.0 {{ DEFAULT_GATEWAY }}
+
+! ======================================================
+!              CONFIGURATION QUALITÉ DE SERVICE (QoS) pour VOIX
+! ======================================================
+! Exemple simplifié : Identifier le trafic voix (ex: basé sur ports UDP/RTP)
+class-map match-any VOICE_TRAFFIC
+ match protocol rtp audio
+! Autre méthode: match ip dscp ef (si les téléphones marquent le trafic)
+! match access-group name VOICE_ACL (si vous définissez une ACL pour la voix)
+!
+
+! Définir une politique pour le trafic voix
+policy-map VOICE_POLICY
+ class VOICE_TRAFFIC
+  priority percent 50  {# Alloue une priorité et une bande passante garantie (exemple: 50% du débit) #}
+ class class-default
+  fair-queue
+!
+
+! ======================================================
+!              SNMP & SUPERVISION
+! ======================================================
+ip access-list standard ACL-SNMP
+    {% for ip in SNMP_PERMIT_IPS %}
+    permit {{ ip }}
+    {% endfor %}
+
+snmp-server community {{ SNMP_COMMUNITY }} RO ACL-SNMP
+{% for host in SNMP_HOSTS %}
+snmp-server host {{ host }} {{ SNMP_COMMUNITY }}
+{% endfor %}
+no snmp-server enable traps
+snmp-server enable traps envmon
+snmp-server enable traps envmon shutdown
+snmp-server enable traps envmon temperature
+no snmp-server enable traps bgp state-changes!
+
+
+! ======================================================
+!              LISTES DE CONTRÔLE D'ACCÈS (ACL)
+! ======================================================
+{% for acl in ACLS_VTY %}
+{{ acl }}
+{% endfor %}
+line vty 0 4
+access-class 25 in
+transport inp all
+exit
+!
+
+! ======================================================
+!              SYNCHRONISATION TEMPORELLE (NTP)
+! ======================================================
+ip access-list standard ACL-NTP
+{% for ip in NTP_PERMIT_IPS %}
+permit {{ ip }}
+{% endfor %}
+no ntp server 172.17.17.75
+{% for server in NTP_SERVERS %}
+ntp server {{ server }}
+{% endfor %}
+ntp access-group peer ACL-NTP
+clock timezone {{ TIMEZONE }}
+!
+
+! ======================================================
+!              PLAN DE CONTRÔLE
+! ======================================================
+control-plane
+
+! ======================================================
+!              FIN DE CONFIGURATION
+! ======================================================
+end 

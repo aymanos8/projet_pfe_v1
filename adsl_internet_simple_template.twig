@@ -1,0 +1,80 @@
+{# Template pour configuration ADSL - Internet Simple (Exemple PPPoE) #}
+hostname {{ hostname }}
+!
+boot-start-marker
+boot-end-marker
+!
+no aaa new-model
+!
+! Configuration de l'interface ADSL (Exemple: VDSL Controller 0/2/0 pour une carte VDSL)
+!
+! Note: L'interface physique dépendra du modèle de routeur et de la carte installée.
+! Consultez la documentation spécifique du modèle.
+!
+controller VDSL 0/2/0
+ operating mode vdsl
+!
+interface GigabitEthernet0/0
+ description Liaison LAN
+ no switchport
+ ip address {{ lan_ip }} {{ lan_mask }}
+ no ip redirects
+ no ip proxy-arp
+ ip flow monitor {{ flow_monitor }} ingress
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+!
+interface Dialer1
+ ip address negotiated
+ ip access-group 101 in
+ ip flow monitor {{ flow_monitor }} ingress
+ no ip redirects
+ no ip proxy-arp
+ encapsulation ppp
+ dialer pool 1
+ dialer-group 1
+ no service-routing
+ ppp authentication chap callin
+ ppp chap hostname {{ ppp_username }}
+ ppp chap password {{ ppp_password }}
+ ppp ipcp route default
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+!
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 Dialer1
+!
+!
+no ip http server
+no ip http secure-server
+!
+logging enable
+logging {{ logging_server }} transport tcp port {{ logging_port }}
+!
+snmp-server community {{ snmp_community }} RO
+!
+line con 0
+ password {{ console_password }}
+ login
+ transport input all
+line aux 0
+!
+line vty 0 4
+ login local
+ transport input ssh
+!
+dialer-list 1 protocol ip permit
+!
+access-list 101 permit ip any any
+!
+end 

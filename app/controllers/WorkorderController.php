@@ -10,25 +10,21 @@ class WorkorderController {
         try {
             $cnx = Database::getInstance()->getConnection();
             $workOrderModel = new WorkOrder($cnx);
-            $equipementModel = new Equipement($cnx);
 
             $url = "https://dev299646.service-now.com/api/now/table/wm_order";
             $username = "admin";
             $password = "N9@uSi@WW5za";
 
             $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Retourne la réponse
-            curl_setopt($ch, CURLOPT_USERPWD, "$username:$password"); // Authentification
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept: application/json"]); // Ac  cepte le format JSON
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept: application/json"]);
 
             $response = curl_exec($ch);
             if ($response === false) {
                 throw new Exception("Erreur cURL : " . curl_error($ch));
             }
             curl_close($ch);
-
-            // Debug : écrire la réponse brute dans un fichier
-            file_put_contents(__DIR__ . '/../../debug_api_response.txt', $response);
 
             $data = json_decode($response, true);
             if (!isset($data['result'])) {
@@ -62,40 +58,12 @@ class WorkorderController {
                 $client = $wo['u_client'] ?? '';
                 $technology = $wo['u_technologie'] ?? '';
                 $offre = $wo['u_offre'] ?? '';
-                $status = $wo['state'] ?? '1';
-                $date = $wo['opened_at'] ?? date('Y-m-d H:i:s');
+                $date = $wo['opened_at'] ? date('Y-m-d H:i:s', strtotime($wo['opened_at'])) : date('Y-m-d H:i:s');
                 $short_description = $wo['short_description'] ?? null;
-                $workOrderModel->save($numero, $client, $technology, $offre, $status, $date, $short_description);
+                $debit = $wo['u_debit'] ?? null;
+
+                $workOrderModel->save($numero, $client, $technology, $offre, null, $date, $short_description, $debit);
                 $count++;
-            }
-
-            // Après la synchronisation, tenter d'affecter automatiquement des équipements
-            foreach ($data['result'] as $wo) {
-                if (!isset($wo['number']) || !isset($wo['u_client'])) {
-                    continue;
-                }
-
-                // Récupérer le work order depuis la base de données
-                $workOrder = $workOrderModel->getByNumber($wo['number']);
-                if (!$workOrder) {
-                    continue;
-                }
-
-                // Vérifier si le work order a déjà un équipement affecté
-                $equipements = $equipementModel->getEquipementsByWorkOrder($workOrder['id']);
-                if (!empty($equipements)) {
-                    continue;
-                }
-
-                // Tenter d'affecter un équipement compatible
-                $equipementCompatible = $equipementModel->getEquipementCompatible(
-                    $wo['u_technologie'] ?? '',
-                    $wo['u_offre'] ?? ''
-                );
-
-                if ($equipementCompatible) {
-                    $equipementModel->affecterEquipement($workOrder['id'], $equipementCompatible['id']);
-                }
             }
 
             return [
@@ -112,6 +80,9 @@ class WorkorderController {
     }
 
     public function index() {
+        // Déclencher la synchronisation avec ServiceNow
+        $this->syncWorkOrders();
+
         require_once __DIR__ . '/../core/Database.php';
         require_once __DIR__ . '/../models/WorkOrder.php';
         require_once __DIR__ . '/AuthController.php';
@@ -151,8 +122,21 @@ class WorkorderController {
         
         $workorder = $workOrderModel->getById($id);
         $equipements = $equipementModel->getEquipementsByWorkOrder($id);
-        $equipementsDisponibles = $equipementModel->getEquipementsDisponibles();
-        
+
+        // Récupérer les équipements disponibles compatibles, en incluant le débit requis
+        $requiredDebit = $workorder['debit'] ?? ''; // Récupérer le débit du work order
+
+        echo "<!-- Debug: Critères de compatibilité pour WO #" . htmlspecialchars($workorder['numero']) . " -->\n";
+        echo "<!-- Debug: Tech requise: " . htmlspecialchars($workorder['technology'] ?? '') . " -->\n";
+        echo "<!-- Debug: Offre requise: " . htmlspecialchars($workorder['offre'] ?? '') . " -->\n";
+        echo "<!-- Debug: Débit requis: " . htmlspecialchars($requiredDebit) . " -->\n";
+
+        $equipementsDisponiblesCompatibles = $equipementModel->getAvailableCompatibleEquipements(
+            $workorder['technology'] ?? '',
+            $workorder['offre'] ?? '',
+            $requiredDebit // Passer le débit requis
+        );
+
         // Passer l'ID et le rôle de l'utilisateur connecté à la vue
         $userId = AuthController::getUserId();
         $userRole = AuthController::getUserRole();
@@ -228,6 +212,8 @@ class WorkorderController {
 
             header('Location: /projet-pfe-v1/projet-t1/public/workorder_detail/' . $work_order_id);
             exit;
+            
+
         }
     }
 

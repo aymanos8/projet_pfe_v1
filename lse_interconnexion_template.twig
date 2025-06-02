@@ -1,0 +1,62 @@
+{# Template pour configuration Liaison Spécialisée Ethernet - Interconnexion de sites #}
+hostname {{ hostname }}
+!
+boot-start-marker
+boot-end-marker
+!
+no aaa new-model
+!
+! Configuration de l'interface Ethernet (Exemple: GigabitEthernet0/1)
+!
+interface GigabitEthernet0/1
+ description Liaison Interconnexion vers {{ remote_site_name }}
+ no switchport
+ ip address {{ local_ip }} {{ local_mask }}
+ no ip redirects
+ no ip proxy-arp
+ ip flow monitor {{ flow_monitor }} ingress
+ duplex auto
+ speed 1000
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/0
+ description Liaison LAN
+ no switchport
+ ip address {{ lan_ip }} {{ lan_mask }}
+ no ip redirects
+ no ip proxy-arp
+ ip flow monitor {{ flow_monitor }} ingress
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+!
+! Routage statique vers le site distant (exemple)
+ip route {{ remote_network }} {{ remote_mask }} {{ remote_next_hop }}
+!
+!
+no ip http server
+no ip http secure-server
+!
+logging enable
+logging {{ logging_server }} transport tcp port {{ logging_port }}
+!
+snmp-server community {{ snmp_community }} RO
+!
+line con 0
+ password {{ console_password }}
+ login
+ transport input all
+line aux 0
+!
+line vty 0 4
+ login local
+ transport input ssh
+!
+end 

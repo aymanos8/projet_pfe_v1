@@ -9,7 +9,7 @@ class WorkOrder
         $this->cnx = $cnx;
     }
 
-    public function save($numero, $client, $technology, $offre, $status, $date, $short_description = null)
+    public function save($numero, $client, $technology, $offre, $status, $date, $short_description = null, $debit = null)
     {
         try {
             // Vérifier si le work order existe déjà
@@ -18,12 +18,14 @@ class WorkOrder
             
             if ($check->rowCount() > 0) {
                 // Mise à jour si existe
-                $stmt = $this->cnx->prepare("UPDATE `work-orders` SET client = ?, technology = ?, offre = ?, status = ?, date = ?, short_description = ? WHERE numero = ?");
-                return $stmt->execute([$client, $technology, $offre, $status, $date, $short_description, $numero]);
+                $stmt = $this->cnx->prepare("UPDATE `work-orders` SET client = ?, technology = ?, offre = ?, date = ?, short_description = ?, debit = ? WHERE numero = ?");
+                return $stmt->execute([$client, $technology, $offre, $date, $short_description, $debit, $numero]);
             } else {
                 // Insertion si n'existe pas
-                $stmt = $this->cnx->prepare("INSERT INTO `work-orders` (numero, client, technology, offre, status, date, short_description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                return $stmt->execute([$numero, $client, $technology, $offre, $status, $date, $short_description]);
+                // Utiliser le statut '1' par défaut pour les nouveaux work orders si $status est null
+                $status_to_save = $status ?? '1';
+                $stmt = $this->cnx->prepare("INSERT INTO `work-orders` (numero, client, technology, offre, status, date, short_description, debit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                return $stmt->execute([$numero, $client, $technology, $offre, $status_to_save, $date, $short_description, $debit]);
             }
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la sauvegarde du work order : " . $e->getMessage());
@@ -33,11 +35,8 @@ class WorkOrder
     public function getAll()
     {
         try {
-            // Jointure avec la table users pour récupérer le nom de l'utilisateur affecté
-            $query = "SELECT wo.*, u.username as assigned_username 
-                      FROM `work-orders` wo
-                      LEFT JOIN users u ON wo.user_id = u.id
-                      ORDER BY wo.date DESC";
+            // Jointure avec la table users pour récupérer le nom de l'utilisateur affecté et inclure le débit
+            $query = "SELECT wo.*, u.username as assigned_username FROM `work-orders` wo LEFT JOIN users u ON wo.user_id = u.id ORDER BY wo.date DESC";
             $stmt = $this->cnx->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -144,11 +143,7 @@ class WorkOrder
      * @return array Retourne un tableau des work orders affectés.
      */
     public function getByUserId($userId) {
-        $query = "SELECT wo.*, u.username as assigned_username 
-                  FROM `work-orders` wo
-                  LEFT JOIN users u ON wo.user_id = u.id
-                  WHERE wo.user_id = :user_id 
-                  ORDER BY date DESC";
+        $query = "SELECT wo.*, u.username as assigned_username FROM `work-orders` wo LEFT JOIN users u ON wo.user_id = u.id WHERE wo.user_id = :user_id ORDER BY date DESC";
         $stmt = $this->cnx->prepare($query);
         $stmt->execute(['user_id' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -191,6 +186,24 @@ class WorkOrder
             return $result['count'];
         } catch (PDOException $e) {
             throw new Exception("Erreur lors du comptage total des work orders par utilisateur : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Récupère un work order par son numéro.
+     *
+     * @param string $numero Le numéro du work order.
+     * @return array|false Retourne le work order sous forme de tableau associatif ou false si non trouvé.
+     */
+    public function getByNumber($numero)
+    {
+        try {
+            $stmt = $this->cnx->prepare("SELECT * FROM `work-orders` WHERE numero = ?");
+            $stmt->execute([$numero]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération du work order par numéro : " . $e->getMessage());
+            return false;
         }
     }
 }

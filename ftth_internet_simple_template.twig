@@ -1,0 +1,62 @@
+{# Template pour configuration FTTH - Internet Simple #}
+hostname {{ hostname }}
+!
+boot-start-marker
+boot-end-marker
+!
+no aaa new-model
+!
+! Affectation des interfaces (Exemple: GigabitEthernet0/1 pour WAN, GigabitEthernet0/0 pour LAN)
+!
+interface GigabitEthernet0/1
+ description Liaison WAN FTTH
+ no switchport
+ ip address {{ wan_ip }} {{ wan_mask }}
+ no ip redirects
+ no ip proxy-arp
+ ip flow monitor {{ flow_monitor }} ingress
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/0
+ description Liaison LAN
+ no switchport
+ ip address {{ lan_ip }} {{ lan_mask }}
+ no ip redirects
+ no ip proxy-arp
+ ip flow monitor {{ flow_monitor }} ingress
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+!
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 {{ default_gateway }}
+!
+!
+no ip http server
+no ip http secure-server
+!
+logging enable
+logging {{ logging_server }} transport tcp port {{ logging_port }}
+!
+snmp-server community {{ snmp_community }} RO
+!
+line con 0
+ password {{ console_password }}
+ login
+ transport input all
+line aux 0
+!
+line vty 0 4
+ login local
+ transport input ssh
+!
+end 

@@ -119,8 +119,8 @@ function tech_label($tech) {
                         <select id="technology-filter">
                             <option value="">Toutes les technologies</option>
                             <option value="fo">FO</option>
+                            <option value="4g">4G</option>
                             <option value="fh">FH</option>
-                            <option value="blr">BLR</option>
                             
                         </select>
                         <select id="status-filter">
@@ -164,7 +164,7 @@ function tech_label($tech) {
     </div>
     <script src="/projet-pfe-v1/projet-t1/public/assets/js/dashboard.js"></script>
 </body>
-</html>
+</html> 
 <?php
 // Limiter le tableau $workOrders aux 3 premiers éléments pour l'affichage récent
 $workOrders = array_slice($workOrders, 0, 3);

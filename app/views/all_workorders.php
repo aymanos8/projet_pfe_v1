@@ -91,8 +91,9 @@ function tech_label($tech) {
                                 <th>ID</th>
                                 <th>N° Work Order</th>
                                 <th>Client</th>
-                                <th>Technologie</th>
+                                <th style="text-align: center;">Technologie</th>
                                 <th>Offre</th>
+                                <th>Débit</th>
                                 <th>État</th>
                                 <th>Date de création</th>
                                 <th>Détail</th>
@@ -107,8 +108,9 @@ function tech_label($tech) {
                                 <td><?php echo htmlspecialchars($wo['id'] ?? ''); ?></td>
                                 <td><?php echo htmlspecialchars($wo['numero']); ?></td>
                                 <td><?php echo htmlspecialchars($wo['client']); ?></td>
-                                <td><?php echo tech_label($wo['technology']); ?></td>
+                                <td style="text-align: center;"><?php echo tech_label($wo['technology']); ?></td>
                                 <td><?php echo htmlspecialchars($wo['offre']); ?></td>
+                                <td><?php echo htmlspecialchars($wo['debit'] ?? '') . ' Mbps'; ?></td>
                                 <td style="min-width: 120px;"><?php echo statut_label($wo['status']); ?></td>
                                 <td><?php echo date('j F Y', strtotime($wo['date'])); ?></td>
                                 <td>

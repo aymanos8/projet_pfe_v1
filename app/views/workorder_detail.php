@@ -89,6 +89,9 @@ if (!$workorder) {
                         <li><span class="workorder-detail-label">Client :</span> <?php echo htmlspecialchars($workorder['client']); ?></li>
                         <li><span class="workorder-detail-label">Technologie :</span> <?php echo htmlspecialchars($workorder['technology']); ?></li>
                         <li><span class="workorder-detail-label">Offre :</span> <?php echo htmlspecialchars($workorder['offre']); ?></li>
+                        <?php if (!empty($workorder['debit'])): ?>
+                            <li><span class="workorder-detail-label">Débit :</span> <?php echo htmlspecialchars($workorder['debit'] ?? '') . ' Mbps'; ?></li>
+                        <?php endif; ?>
                         <li><span class="workorder-detail-label">Date :</span> <?php echo htmlspecialchars($workorder['date']); ?></li>
                         <li><span class="workorder-detail-label">Statut :</span> 
                             <?php 
@@ -175,7 +178,7 @@ if (!$workorder) {
                         <?php endif; ?>
 
                         <!-- Formulaire d'affectation d'équipement -->
-                        <?php if (!empty($equipementsDisponibles)): ?>
+                        <?php if (!empty($equipementsDisponiblesCompatibles)): ?>
                             <div class="mt-4">
                                 <h6>Affecter un nouvel équipement</h6>
                                 <form action="/projet-pfe-v1/projet-t1/public/workorder/affecter-equipement" method="POST" class="row g-3">
@@ -183,7 +186,7 @@ if (!$workorder) {
                                     <div class="col-md-8">
                                         <select name="equipement_id" class="form-select" required>
                                             <option value="">Sélectionner un équipement</option>
-                                            <?php foreach ($equipementsDisponibles as $equipement): ?>
+                                            <?php foreach ($equipementsDisponiblesCompatibles as $equipement): ?>
                                                 <option value="<?php echo $equipement['id']; ?>">
                                                     <?php echo htmlspecialchars($equipement['marque'] . ' - ' . $equipement['modele'] . ' (' . $equipement['numero_serie'] . ')'); ?>
                                                 </option>

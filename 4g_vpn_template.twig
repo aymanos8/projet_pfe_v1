@@ -1,0 +1,168 @@
+{# Template pour configuration 4G - VPN Site-à-Site #}
+hostname {{ ROUTER_HOSTNAME }}
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 100000
+no logging console
+no logging monitor
+!
+
+! ======================================================
+!              AAA & AUTHENTIFICATION
+! ======================================================
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication login CONSOLE local group tacacs+
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default local group tacacs+ if-authenticated
+aaa authorization exec local_author local group tacacs+
+aaa authorization exec CONSOLE local group tacacs+ if-authenticated
+aaa authorization commands 1 local_author group tacacs+ local
+aaa authorization commands 4 default group tacacs+ local if-authenticated
+aaa authorization commands 15 default group tacacs+ local if-authenticated
+aaa session-id common
+ip tacacs source-interface {{ INTERFACE_MGMT }}
+tacacs-server host {{ TACACS_SERVER_1 }}
+tacacs-server host {{ TACACS_SERVER_2 }} single-connection timeout 1
+tacacs-server directed-request
+tacacs-server key {{ TACACS_KEY }}
+
+
+! ======================================================
+!              COMPTES & MOTS DE PASSE
+! ======================================================
+enable secret {{ ADMIN_PASS }}
+username {{ ADMIN_USER }} privilege 15 password {{ ADMIN_PASS }}
+
+! ======================================================
+!              INTERFACES & IP ADDRESSING
+! ======================================================
+
+{# Configuration de l'interface WAN 4G (Exemple: Cellular 0/1/0) #}
+{# Note: Les détails de configuration 4G (APN, profil, etc.) peuvent varier considérablement #}
+interface {{ WAN_INTERFACE_CELLULAR }}
+ description Liaison WAN 4G - {{ CLIENT_NAME }}
+ no ip address
+ encapsulation ppp
+ dialer pool 1
+ dialer-group 1
+!
+
+interface {{ WAN_INTERFACE_DIALER }}
+ ip address negotiated
+ ip mtu 1440
+ ip tcp adjust-mss 1400
+ encapsulation ppp
+ dialer pool 1
+ dialer-group 1
+ no service-routing
+ ppp authentication chap callin
+ ppp chap hostname {{ PPP_USERNAME }}
+ ppp chap password {{ PPP_PASSWORD }}
+ ppp ipcp route default
+!
+
+{% for iface in LAN_INTERFACES %}
+interface {{ iface.NOM_INTERFACE }}
+ description {{ iface.DESCRIPTION }}
+ ip address {{ iface.LAN_IP }} {{ iface.LAN_MASK }}
+!
+{% endfor %}
+
+! ======================================================
+!              SERVICES IP & SÉCURITÉ
+! ======================================================
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip forward-protocol nd
+
+ip ssh version 2
+
+! ======================================================
+!              ROUTAGE STATIQUE
+! ======================================================
+ip route 0.0.0.0 0.0.0.0 {{ DEFAULT_GATEWAY }}
+
+! ======================================================
+!              CONFIGURATION VPN IPSec Site-à-Site
+! ======================================================
+crypto isakmp policy 10
+ encr {{ VPN_ENCRYPTION }}
+ authentication pre-share
+ group {{ VPN_DH_GROUP }}
+ lifetime {{ VPN_LIFETIME }}
+!
+crypto isakmp key {{ VPN_PRE_SHARED_KEY }} address {{ VPN_PEER_IP }}
+!
+crypto ipsec transform-set MY_TRANSFORM_SET esp-{{ VPN_TRANSFORM_ENCRYPTION }} esp-{{ VPN_TRANSFORM_HASH }}-hmac
+ mode tunnel
+!
+! Define "interesting" traffic (traffic to be encrypted)
+access-list 101 permit ip {{ LAN_NETWORK }} {{ LAN_WILDCARD }} {{ REMOTE_VPN_NETWORK }} {{ REMOTE_VPN_WILDCARD }}
+!
+crypto map MY_VPN_MAP 10 ipsec-isakmp
+ set peer {{ VPN_PEER_IP }}
+ set transform-set MY_TRANSFORM_SET
+ match address 101
+!
+
+! ======================================================
+!              SNMP & SUPERVISION
+! ======================================================
+ip access-list standard ACL-SNMP
+    {% for ip in SNMP_PERMIT_IPS %}
+    permit {{ ip }}
+    {% endfor %}
+
+snmp-server community {{ SNMP_COMMUNITY }} RO ACL-SNMP
+{% for host in SNMP_HOSTS %}
+snmp-server host {{ host }} {{ SNMP_COMMUNITY }}
+{% endfor %}
+no snmp-server enable traps
+snmp-server enable traps envmon
+snmp-server enable traps envmon shutdown
+snmp-server enable traps envmon temperature
+no snmp-server enable traps bgp state-changes!
+
+
+! ======================================================
+!              LISTES DE CONTRÔLE D'ACCÈS (ACL)
+! ======================================================
+{% for acl in ACLS_VTY %}
+{{ acl }}
+{% endfor %}
+line vty 0 4
+access-class 25 in
+transport inp all
+exit
+!
+
+! ======================================================
+!              SYNCHRONISATION TEMPORELLE (NTP)
+! ======================================================
+ip access-list standard ACL-NTP
+{% for ip in NTP_PERMIT_IPS %}
+permit {{ ip }}
+{% endfor %}
+no ntp server 172.17.17.75
+{% for server in NTP_SERVERS %}
+ntp server {{ server }}
+{% endfor %}
+ntp access-group peer ACL-NTP
+clock timezone {{ TIMEZONE }}
+!
+
+! ======================================================
+!              PLAN DE CONTRÔLE
+! ======================================================
+control-plane
+
+! ======================================================
+!              FIN DE CONFIGURATION
+! ======================================================
+end 

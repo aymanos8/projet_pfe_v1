@@ -41,9 +41,13 @@ try {
         `modele` VARCHAR(100) NOT NULL,
         `marque` VARCHAR(50) NOT NULL,
         `type_interfaces` VARCHAR(255),
-        `capacite` VARCHAR(100),
+        `gamme` VARCHAR(100),
+        `technology` VARCHAR(100) NULL,
+        `offre` VARCHAR(100) NULL,
+        `debit` VARCHAR(50) NULL,
         `statut` ENUM('disponible', 'en_service', 'maintenance') DEFAULT 'disponible',
         `numero_serie` VARCHAR(100),
+        UNIQUE KEY `numero_serie_unique` (`numero_serie`),
         `date_ajout` DATETIME DEFAULT CURRENT_TIMESTAMP,
         `date_modification` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
@@ -65,15 +69,32 @@ try {
     $cnx->exec($sql);
     echo "Table 'affectations_workorders' créée ou déjà existante avec succès.\n";
 
-    // Insertion des modèles de routeurs Cisco
-    $sql = "INSERT INTO `equipements_reseau` (`modele`, `marque`, `type_interfaces`, `capacite`) VALUES
-        ('C891F ISR', 'Cisco', 'GigabitEthernet, Serial, Cellular', 'Routeur ISR 4G'),
-        ('881-K9', 'Cisco', 'FastEthernet, Serial', 'Routeur SOHO'),
-        ('881G-4G-GA-K9', 'Cisco', 'FastEthernet, Serial, Cellular', 'Routeur 4G')
-    ON DUPLICATE KEY UPDATE `type_interfaces` = VALUES(`type_interfaces`), `capacite` = VALUES(`capacite`);";
+    // Insertion des modèles de routeurs Cisco (exemple, à adapter)
+    // Cette partie peut être supprimée ou modifiée pour ajouter vos propres équipements avec les nouveaux champs
+    // $sql = "INSERT INTO `equipements_reseau` (`modele`, `marque`, `type_interfaces`, `capacite`) VALUES
+    //     ('C891F ISR', 'Cisco', 'GigabitEthernet, Serial, Cellular', 'Routeur ISR 4G'),
+    //     ('881-K9', 'Cisco', 'FastEthernet, Serial', 'Routeur SOHO'),
+    //     ('881G-4G-GA-K9', 'Cisco', 'FastEthernet, Serial, Cellular', 'Routeur 4G')
+    // ON DUPLICATE KEY UPDATE `type_interfaces` = VALUES(`type_interfaces`), `capacite` = VALUES(`capacite`);";
     
-    $cnx->exec($sql);
-    echo "Modèles de routeurs Cisco ajoutés avec succès.\n";
+    // $cnx->exec($sql);
+    // echo "Modèles de routeurs Cisco ajoutés avec succès.\n";
+    
+    // Vous pouvez ajouter de nouvelles insertions ici avec les champs technology, offre, debit
+    // Exemple :
+    // $sql_insert_cisco = "INSERT INTO `equipements_reseau` (`modele`, `marque`, `type_interfaces`, `gamme`, `technology`, `offre`, `debit`, `numero_serie`) VALUES
+    //     ('C9200L-24P-4X', 'Cisco', 'Ethernet', 'Catalyst 9200', 'FO,FH', 'Internet,VPN', '1Gbps', 'SN_C9200L_001'),
+    //     ('ISR4331/K9', 'Cisco', 'Ethernet,Serial', 'ISR 4300', 'FO,4G', 'Internet,Voix', '500Mbps', 'SN_ISR4331_001');";
+    // try {
+    //     $cnx->exec($sql_insert_cisco);
+    //     echo "Exemples d'équipements Cisco ajoutés avec succès.\n";
+    // } catch(PDOException $e) {
+    //     // Ignorer l'erreur si les équipements existent déjà
+    //     if (strpos($e->getMessage(), 'Duplicate entry') === false) {
+    //         throw $e; 
+    //     }
+    //      echo "Exemples d'équipements Cisco déjà existants.\n";
+    // }
     
     // Création de la table users
     $sql = "CREATE TABLE IF NOT EXISTS `users` (
