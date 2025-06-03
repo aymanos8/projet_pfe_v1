@@ -61,9 +61,6 @@ class Equipement {
             return false;
         }
 
-        // Démarrer une transaction
-        $this->db->beginTransaction();
-
         try {
             // Mettre à jour le statut de l'équipement
             $query = "UPDATE equipements_reseau SET statut = 'en_service' WHERE id = :id";
@@ -79,10 +76,9 @@ class Equipement {
                 'equipement_id' => $equipement_id
             ]);
 
-            $this->db->commit();
             return true;
         } catch (Exception $e) {
-            $this->db->rollBack();
+            error_log("Erreur DB dans Equipement::affecterEquipement : " . $e->getMessage());
             return false;
         }
     }
@@ -196,6 +192,31 @@ class Equipement {
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Erreur lors de la récupération de l'équipement par numéro de série : " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Nouvelle méthode pour désaffecter un équipement d'un work order
+    public function desaffecterEquipement($work_order_id, $equipement_id) {
+        try {
+            // Supprimer l'affectation de la table affectations_workorders
+            $queryAffectation = "DELETE FROM affectations_workorders 
+                               WHERE work_order_id = :work_order_id 
+                               AND equipement_id = :equipement_id";
+            $stmtAffectation = $this->db->prepare($queryAffectation);
+            $stmtAffectation->execute([
+                'work_order_id' => $work_order_id,
+                'equipement_id' => $equipement_id
+            ]);
+
+            // Mettre à jour le statut de l'équipement à 'disponible'
+            $queryEquipement = "UPDATE equipements_reseau SET statut = 'disponible' WHERE id = :id";
+            $stmtEquipement = $this->db->prepare($queryEquipement);
+            $stmtEquipement->execute(['id' => $equipement_id]);
+
+            return true;
+        } catch (Exception $e) {
+            error_log("Erreur DB dans Equipement::desaffecterEquipement : " . $e->getMessage());
             return false;
         }
     }

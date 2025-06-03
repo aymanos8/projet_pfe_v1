@@ -40,7 +40,7 @@ function tech_label($tech) {
                 <li><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
-                <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
+                <li><a href="/projet-pfe-v1/projet-t1/public/historiques"><i class="fas fa-history"></i> Historiques</a></li>
                 <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
                     <li><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
                 <?php endif; ?>
@@ -85,11 +85,6 @@ function tech_label($tech) {
             <div class="dashboard-content">
                 <!-- Summary Cards -->
                 <div class="summary-cards">
-                    <div class="card">
-                        <i class="fas fa-server"></i>
-                        <h3>Équipements à configurer</h3>
-                        <p>12</p>
-                    </div>
                     <div class="card">
                         <i class="fas fa-tasks"></i>
                         <h3>Work-Orders en attente</h3>

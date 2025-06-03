@@ -12,7 +12,6 @@ class ConfigController {
     }
 
     public function index($equipementId = null) {
-        session_start();
         $config = '';
         $equipement = null;
         $formData = []; // Initialize formData
@@ -43,7 +42,6 @@ class ConfigController {
     }
 
     public function generer() {
-        session_start();
         $config = '';
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

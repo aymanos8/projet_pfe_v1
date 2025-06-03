@@ -9,10 +9,6 @@ class AuthController {
      * Affiche la page de connexion.
      */
     public function showLoginForm() {
-        // Démarrer la session si ce n'est pas déjà fait
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
         // Afficher les messages d'erreur ou de succès si présents
         $error = $_SESSION['error'] ?? null;
         $success = $_SESSION['success'] ?? null;
@@ -26,10 +22,6 @@ class AuthController {
      * Affiche la page d'inscription.
      */
     public function showRegisterForm() {
-         // Démarrer la session si ce n'est pas déjà fait
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
         // Afficher les messages d'erreur ou de succès si présents
         $error = $_SESSION['error'] ?? null;
         $success = $_SESSION['success'] ?? null;
@@ -43,11 +35,6 @@ class AuthController {
      * Gère la soumission du formulaire de connexion.
      */
     public function login() {
-        // Démarrer la session si ce n'est pas déjà fait
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $login = $_POST['login'] ?? ''; // Peut être email ou username
             $password = $_POST['password'] ?? '';
@@ -98,11 +85,6 @@ class AuthController {
      * Gère la soumission du formulaire d'inscription.
      */
     public function register() {
-        // Démarrer la session si ce n'est pas déjà fait
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
             $email = $_POST['email'] ?? '';
@@ -154,11 +136,6 @@ class AuthController {
      * Gère la déconnexion de l'utilisateur.
      */
     public function logout() {
-        // Démarrer la session si ce n'est pas déjà fait
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
         // Détruire toutes les variables de session
         $_SESSION = array();
 
@@ -186,9 +163,6 @@ class AuthController {
      * @return bool True si connecté, false sinon.
      */
     public static function isLoggedIn() {
-         if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
         return isset($_SESSION['user_id']);
     }
 
@@ -198,11 +172,8 @@ class AuthController {
      * @return string|null Le rôle de l'utilisateur ou null si non connecté.
      */
     public static function getUserRole() {
-        if (session_status() == PHP_SESSION_NONE) {
-           session_start();
-       }
-       return $_SESSION['user_role'] ?? null;
-   }
+        return $_SESSION['user_role'] ?? null;
+    }
 
     /**
      * Obtient l'ID de l'utilisateur connecté.
@@ -210,9 +181,6 @@ class AuthController {
      * @return int|null L'ID de l'utilisateur ou null si non connecté.
      */
    public static function getUserId() {
-       if (session_status() == PHP_SESSION_NONE) {
-          session_start();
-      }
-      return $_SESSION['user_id'] ?? null;
-  }
+       return $_SESSION['user_id'] ?? null;
+   }
 } 

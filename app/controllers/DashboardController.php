@@ -5,13 +5,11 @@ require_once __DIR__ . '/../models/Utilisateur.php';
 
 class DashboardController {
     public function index() {
-        session_start();
-
         $userId = $_SESSION['user_id'] ?? null;
         $is_admin = $_SESSION['is_admin'] ?? false;
         $username = $_SESSION['username'] ?? 'Invité';
 
-        if ($userId === null && !$is_admin) {
+        if ($userId === null) {
             header('Location: /projet-pfe-v1/projet-t1/public/login');
             exit();
         }

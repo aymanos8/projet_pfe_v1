@@ -4,6 +4,7 @@ require_once __DIR__ . '/../models/Equipement.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/AuthController.php'; // Assurez-vous que AuthController est chargé
 require_once __DIR__ . '/../models/Utilisateur.php'; // Inclure le modèle Utilisateur
+require_once __DIR__ . '/../models/HistoriqueAction.php'; // Inclure le modèle HistoriqueAction
 
 class WorkorderController {
     public function syncWorkOrders() {
@@ -145,23 +146,49 @@ class WorkorderController {
     }
 
     public function affecterEquipement() {
+        error_log("DEBUG: affecterEquipement method called.");
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $work_order_id = $_POST['work_order_id'] ?? null;
             $equipement_id = $_POST['equipement_id'] ?? null;
 
+            error_log("DEBUG: POST request received.");
+            error_log("DEBUG: work_order_id = " . $work_order_id);
+            error_log("DEBUG: equipement_id = " . $equipement_id);
+
             if (!$work_order_id || !$equipement_id) {
+                error_log("DEBUG: Missing work_order_id or equipement_id.");
                 $_SESSION['error'] = "Données manquantes pour l'affectation.";
                 header('Location: /projet-pfe-v1/projet-t1/public/workorder_detail/' . $work_order_id);
                 exit;
             }
 
-            $cnx = Database::getInstance()->getConnection();
-            $equipementModel = new Equipement($cnx);
+            $database = Database::getInstance();
+            $equipementModel = new Equipement($database->getConnection());
+            $historiqueModel = new HistoriqueAction($database); // Instancier le modèle HistoriqueAction
+            $userId = AuthController::getUserId(); // Récupérer l'ID de l'utilisateur connecté
 
-            if ($equipementModel->affecterEquipement($work_order_id, $equipement_id)) {
-                $_SESSION['success'] = "Équipement affecté avec succès.";
-            } else {
-                $_SESSION['error'] = "Erreur lors de l'affectation de l'équipement.";
+            // Démarrer une transaction pour affectation et historique
+            $database->getConnection()->beginTransaction();
+
+            try {
+                if ($equipementModel->affecterEquipement($work_order_id, $equipement_id)) {
+                    // Enregistrer l'action dans l'historique
+                    $historiqueModel->addAction(
+                        $userId,
+                        'affectation',
+                        'equipement',
+                        $equipement_id,
+                        "Affectation au Work Order #" . $work_order_id
+                    );
+                    $_SESSION['success'] = "Équipement affecté avec succès.";
+                     $database->getConnection()->commit(); // Committer la transaction
+                } else {
+                    $_SESSION['error'] = "Erreur lors de l'affectation de l'équipement.";
+                     $database->getConnection()->rollBack(); // Annuler la transaction
+                }
+            } catch (Exception $e) {
+                 $database->getConnection()->rollBack(); // Annuler la transaction en cas d'exception
+                 $_SESSION['error'] = "Erreur lors de l'affectation de l'équipement : " . $e->getMessage();
             }
 
             header('Location: /projet-pfe-v1/projet-t1/public/workorder_detail/' . $work_order_id);
@@ -180,33 +207,35 @@ class WorkorderController {
                 exit;
             }
 
-            $cnx = Database::getInstance()->getConnection();
-            $equipementModel = new Equipement($cnx);
+            $database = Database::getInstance();
+            $equipementModel = new Equipement($database->getConnection());
+            $historiqueModel = new HistoriqueAction($database); // Instancier le modèle HistoriqueAction
+            $userId = AuthController::getUserId(); // Récupérer l'ID de l'utilisateur connecté
 
             // Démarrer une transaction
-            $cnx->beginTransaction();
+            $database->getConnection()->beginTransaction();
 
             try {
-                // Supprimer l'affectation
-                $queryAffectation = "DELETE FROM affectations_workorders 
-                                   WHERE work_order_id = :work_order_id 
-                                   AND equipement_id = :equipement_id";
-                $stmtAffectation = $cnx->prepare($queryAffectation);
-                $stmtAffectation->execute([
-                    'work_order_id' => $work_order_id,
-                    'equipement_id' => $equipement_id
-                ]);
-
-                // Mettre à jour le statut de l'équipement à 'disponible'
-                $queryEquipement = "UPDATE equipements_reseau SET statut = 'disponible' WHERE id = :id";
-                $stmtEquipement = $cnx->prepare($queryEquipement);
-                $stmtEquipement->execute(['id' => $equipement_id]);
-
-                $cnx->commit();
-                $_SESSION['success'] = "Équipement désaffecté avec succès.";
+                // Supprimer l'affectation (Utiliser le modèle Equipement ou faire la requête ici)
+                 // Assuming EquipementModel::desaffecterEquipement exists and handles DB operations
+                 if ($equipementModel->desaffecterEquipement($work_order_id, $equipement_id)) {
+                    // Enregistrer l'action dans l'historique
+                    $historiqueModel->addAction(
+                        $userId,
+                        'desaffectation',
+                        'equipement',
+                        $equipement_id,
+                        "Désaffectation du Work Order #" . $work_order_id
+                    );
+                     $database->getConnection()->commit(); // Committer la transaction
+                     $_SESSION['success'] = "Équipement désaffecté avec succès.";
+                 } else {
+                     $database->getConnection()->rollBack(); // Annuler la transaction
+                     $_SESSION['error'] = "Erreur lors de la désaffectation de l'équipement.";
+                 }
 
             } catch (Exception $e) {
-                $cnx->rollBack();
+                $database->getConnection()->rollBack();
                 $_SESSION['error'] = "Erreur lors de la désaffectation de l'équipement : " . $e->getMessage();
             }
 
@@ -236,31 +265,42 @@ class WorkorderController {
                 exit;
             }
 
-            $cnx = Database::getInstance()->getConnection();
-            $workOrderModel = new WorkOrder($cnx);
+            $database = Database::getInstance();
+            $workOrderModel = new WorkOrder($database->getConnection()); // Assurez-vous que WorkOrder prend la connexion
+            $historiqueModel = new HistoriqueAction($database); // Instancier le modèle HistoriqueAction
+            $currentUserId = AuthController::getUserId(); // Récupérer l'ID de l'utilisateur connecté qui effectue l'action
 
-            // Appeler une nouvelle méthode dans le modèle WorkOrder pour affecter l'utilisateur
-            if ($workOrderModel->affectUser($work_order_id, $user_id)) {
-                $_SESSION['success'] = "Work order affecté à l'utilisateur avec succès.";
-            } else {
-                $_SESSION['error'] = "Erreur lors de l'affectation du work order à l'utilisateur.";
+            // Démarrer une transaction
+            $database->getConnection()->beginTransaction();
+
+            try {
+                // Appeler une méthode dans le modèle WorkOrder pour affecter l'utilisateur
+                // Supposons que la méthode affectUser existe dans WorkOrder et gère les opérations DB
+                if ($workOrderModel->affectUser($work_order_id, $user_id)) {
+                     // Enregistrer l'action dans l'historique
+                    $historiqueModel->addAction(
+                        $currentUserId,
+                        'affectation',
+                        'workorder',
+                        $work_order_id,
+                        "Affectation à l'utilisateur #" . $user_id
+                    );
+
+                    $database->getConnection()->commit();
+                    $_SESSION['success'] = "Work order affecté à l'utilisateur avec succès.";
+                } else {
+                    $database->getConnection()->rollBack();
+                    $_SESSION['error'] = "Erreur lors de l'affectation du work order à l'utilisateur.";
+                }
+
+            } catch (Exception $e) {
+                 $database->getConnection()->rollBack();
+                 $_SESSION['error'] = "Erreur lors de l'affectation du work order à l'utilisateur : " . $e->getMessage();
             }
 
-            // Recharger les work orders et afficher la vue (similaire à la méthode index)
-            $userModel = new Utilisateur($cnx); // Instancier le modèle Utilisateur si ce n'est pas déjà fait
-            $users = $userModel->getAllUsersOnly(); // Récupérer la liste des utilisateurs pour la vue
-
-            // Récupérer les work orders (filtrés ou tous, selon le rôle de l'utilisateur connecté)
-            $userRole = AuthController::getUserRole();
-            $userId = AuthController::getUserId();
-
-            if ($userRole === 'admin') {
-                $workOrders = $workOrderModel->getAll();
-            } else {
-                $workOrders = $workOrderModel->getByUserId($userId);
-            }
-
-            require __DIR__ . '/../views/all_workorders.php';
+            // Rediriger vers la page des work orders après l'affectation
+            header('Location: /projet-pfe-v1/projet-t1/public/workorders');
+            exit;
         }
     }
 

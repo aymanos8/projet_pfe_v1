@@ -21,16 +21,22 @@ body {
 .container {
     display: flex;
     min-height: 100vh;
+    width: 100%;
 }
 
 /* Sidebar Styles */
 .sidebar {
     width: 250px;
+    min-width: 250px;
     background-color: var(--primary-color);
     color: white;
     padding: 20px 0;
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .sidebar-header {
@@ -46,6 +52,7 @@ body {
 .nav-links {
     list-style: none;
     flex-grow: 1;
+    padding: 0;
 }
 
 .nav-links li {
@@ -76,6 +83,7 @@ body {
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
 }
 
 .version {
@@ -90,6 +98,22 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    padding: 0;
+    flex-basis: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Styles spécifiques pour la page Historiques */
+.page-historiques .main-content {
+    /* S'assurer que le contenu principal prend l'espace flexible restant */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    width: auto;
+    min-width: 0;
+    padding: 0; /* Assurer pas de padding ici */
+    box-sizing: border-box;
 }
 
 /* Top Bar Styles */
@@ -100,6 +124,7 @@ body {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1;
 }
 
 .search-container {
@@ -213,6 +238,34 @@ body {
 .dashboard-content {
     padding: 30px;
     flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Styles spécifiques pour le contenu du tableau de bord sur la page Historiques */
+.page-historiques .dashboard-content {
+     /* Appliquer le padding interne ici */
+     padding: 30px;
+     flex-grow: 1;
+     width: 100%; /* Assurer qu'il prend toute la largeur du parent */
+     box-sizing: border-box;
+}
+
+/* Réinitialiser les marges et paddings potentiels des éléments enfants directs de dashboard-content */
+.dashboard-content > h2,
+.dashboard-content > .card,
+.dashboard-content > .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.dashboard-content .card-body {
+    padding: 15px;
+}
+
+/* Styles spécifiques pour le card-body sur la page Historiques si nécessaire */
+.page-historiques .card-body {
+     padding: 15px; /* Rétablir un padding interne spécifique aux cartes */
 }
 
 /* Summary Cards Styles */
@@ -293,7 +346,7 @@ th {
 
 /* Style pour la cellule de statut dans le tableau */
 td:nth-child(5) {
-    min-width: 100px; /* Ajustez cette valeur si nécessaire pour que le texte tienne sur une ligne */
+    min-width: 100px;
 }
 
 /* Status Badge Styles */
@@ -304,45 +357,36 @@ td:nth-child(5) {
     font-size: 0.85em;
     font-weight: 600;
     text-align: center;
-    min-width: 80px; /* Pour assurer une largeur minimale */
-    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    min-width: 80px;
+    white-space: nowrap;
 }
 
-.status-1 { /* En Attente */
-    background-color: #ffecb3; /* Jaune pâle */
-    color: #663c00; /* Texte marron foncé */
-    border: 1px solid #ffb300; /* Bordure jaune */
+.status-1 {
+    background-color: #ffecb3;
+    color: #663c00;
+    border: 1px solid #ffb300;
 }
 
-.status-2 { /* En Cours */
-    background-color: #bbdefb; /* Bleu pâle */
-    color: #0d47a1; /* Texte bleu foncé */
-    border: 1px solid #2196f3; /* Bordure bleue */
+.status-2 {
+    background-color: #bbdefb;
+    color: #0d47a1;
+    border: 1px solid #2196f3;
 }
 
-.status-3 { /* Terminé */
-    background-color: #c8e6c9; /* Vert pâle */
-    color: #1b5e20; /* Texte vert foncé */
-    border: 1px solid #4caf50; /* Bordure verte */
+.status-3 {
+    background-color: #c8e6c9;
+    color: #1b5e20;
+    border: 1px solid #4caf50;
 }
 
 /* History Sidebar Styles */
 .history-sidebar {
-    width: 300px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .history-sidebar h2 {
-    margin-bottom: 20px;
 }
 
 .history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
 }
 
 /* Responsive Design */
@@ -353,8 +397,12 @@ td:nth-child(5) {
 
     .sidebar {
         width: 100%;
+        min-width: auto;
         flex-direction: row;
         padding: 10px;
+        position: relative;
+        height: auto;
+        overflow-y: visible;
     }
 
     .nav-links {
@@ -364,6 +412,10 @@ td:nth-child(5) {
 
     .nav-links li {
         padding: 10px;
+    }
+
+    .nav-links li a {
+        padding: 10px 15px;
     }
 
     .sidebar-footer {
@@ -392,5 +444,10 @@ td:nth-child(5) {
 
     .filters {
         flex-direction: column;
+        gap: 10px;
+    }
+
+    .filters .col-md-3 {
+        width: 100%;
     }
 } 

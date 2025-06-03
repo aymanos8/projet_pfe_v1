@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // public/index.php
 
 use PSpell\Config;
@@ -10,6 +12,7 @@ require_once '../app/controllers/EquipementController.php';
 require_once '../app/controllers/DashboardController.php';
 require_once '../app/controllers/AuthController.php';
 require_once '../app/controllers/StatisticsController.php';
+require_once '../app/controllers/HistoriqueController.php';
 // require_once '../app/config/config.php'; // Inclure le fichier de configuration
 
 $router = new Router();
@@ -42,6 +45,7 @@ $router->get('/configuration', [ConfigController::class, 'index']);
 $router->get('/configuration/{id}', [ConfigController::class, 'index']);
 $router->get('/logout', [AuthController::class, 'logout']);
 $router->get('/statistics', [StatisticsController::class, 'index']);
+$router->get('/historiques', [HistoriqueController::class, 'index']);
 
 // Routes POST
 $router->post('/user/create', [ConfigController::class, 'create']);
