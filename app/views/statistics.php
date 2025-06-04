@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiques</title>
-    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/common.css">
     <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/statistics.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -21,7 +21,9 @@
                 <li><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work Orders</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
-                <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                <li><a href="/projet-pfe-v1/projet-t1/public/historiques"><i class="fas fa-history"></i> Historiques</a></li>
+                <?php endif; ?>
                 <li class="active"><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
             </ul>
             <div class="sidebar-footer">
@@ -34,6 +36,33 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="profile" id="profile-menu">
+                    <div class="profile-info">
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <span class="name"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Utilisateur'); ?></span>
+                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? '')); ?></span>
+                        <?php else: ?>
+                            <span class="name">Invité</span>
+                            <span class="role">Non connecté</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-title">Mon compte</div>
+                        <div class="dropdown-item">Profil</div>
+                        <div class="dropdown-item">Préférences</div>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <a href="/projet-pfe-v1/projet-t1/public/logout" class="dropdown-item logout-item">Se déconnecter</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </header>
+
             <div class="dashboard-content">
                 <h2>Statistiques</h2>
 
@@ -84,13 +113,9 @@
                                 <span class="label">Disponibles</span>
                                 <span class="value"><?php echo $equipementsByStatus['disponible']; ?></span>
                             </div>
-                            <div class="kpi-item">
-                                <span class="label">En service</span>
-                                <span class="value"><?php echo $equipementsByStatus['en_service']; ?></span>
-                            </div>
-                            <div class="kpi-item">
-                                <span class="label">En maintenance</span>
-                                <span class="value"><?php echo $equipementsByStatus['maintenance']; ?></span>
+                             <div class="kpi-item">
+                                <span class="label">Indisponible</span>
+                                <span class="value"><?php echo $equipementsByStatus['indisponible']; ?></span>
                             </div>
                         </div>
                     </div>
@@ -106,11 +131,6 @@
                             </div>
                             <?php endforeach; ?>
                         </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <h3>Temps Moyen de Traitement</h3>
-                        <div class="kpi-value"><?php echo $avgTreatmentTime; ?>h</div>
                     </div>
                 </div>
 
@@ -135,71 +155,24 @@
         </main>
     </div>
 
-    <script>
-        // Données pour les graphiques
-        const workOrdersByTechnology = <?php echo json_encode($workOrdersByTechnology); ?>;
-        const workOrdersEvolution = <?php echo json_encode($workOrdersEvolution); ?>;
-        const equipementsByMarque = <?php echo json_encode($equipementsByMarque); ?>;
-
-        // Graphique de répartition par technologie
-        const technologyOptions = {
-            series: workOrdersByTechnology.map(item => item.count),
-            chart: {
-                type: 'donut',
-                height: 350
-            },
-            labels: workOrdersByTechnology.map(item => item.technology),
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }]
-        };
-        new ApexCharts(document.querySelector("#technologyChart"), technologyOptions).render();
-
-        // Graphique d'évolution des work orders
-        const evolutionOptions = {
-            series: [{
-                name: 'Work Orders',
-                data: workOrdersEvolution.map(item => item.count)
-            }],
-            chart: {
-                type: 'area',
-                height: 350
-            },
-            xaxis: {
-                categories: workOrdersEvolution.map(item => item.date)
+    <?php
+// Rendre les données PHP disponibles pour JavaScript
+?>
+<script>
+    const workOrdersByTechnologyData = <?php echo json_encode(['technologies' => array_column($workOrdersByTechnology, 'technology'), 'counts' => array_column($workOrdersByTechnology, 'count')]); ?>;
+    const workOrdersEvolutionData = <?php echo json_encode(['dates' => array_column($workOrdersEvolution, 'date'), 'counts' => array_column($workOrdersEvolution, 'count')]); ?>;
+    const equipementsByMarqueData = <?php echo json_encode(['marques' => array_column($equipementsByMarque, 'marque'), 'counts' => array_column($equipementsByMarque, 'count')]); ?>;
+</script>
+<script src="/projet-pfe-v1/projet-t1/public/assets/js/statistics.js"></script>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+             const profileMenu = document.getElementById('profile-menu');
+            if (profileMenu) {
+                profileMenu.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
             }
-        };
-        new ApexCharts(document.querySelector("#evolutionChart"), evolutionOptions).render();
-
-        // Graphique de répartition des équipements
-        const equipementsOptions = {
-            series: equipementsByMarque.map(item => item.count),
-            chart: {
-                type: 'pie',
-                height: 350
-            },
-            labels: equipementsByMarque.map(item => item.marque),
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }]
-        };
-        new ApexCharts(document.querySelector("#equipementsChart"), equipementsOptions).render();
+        });
     </script>
 </body>
 </html> 

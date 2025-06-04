@@ -6,61 +6,8 @@
     <title>Historique des Actions</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/projet-pfe-v1/projet-t1/public/assets/css/dashboard.css" rel="stylesheet"> <!-- Chemin corrigé -->
-    <style>
-        /* Styles pour surcharger les styles specifiques de page-historiques dans dashboard.css */
-        .page-historiques .main-content {
-            flex-grow: 1 !important;
-            flex-shrink: 1 !important;
-            flex-basis: auto !important; /* Ou 0, en fonction du comportement souhaité */
-            width: auto !important;
-            min-width: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            box-sizing: border-box !important;
-        }
-
-        .page-historiques .dashboard-content {
-             padding: 30px !important; /* Rétablir le padding souhaité */
-             flex-grow: 1 !important;
-             width: 100% !important;
-             box-sizing: border-box !important;
-        }
-
-        .page-historiques .dashboard-content > h2,
-        .page-historiques .dashboard-content > .card,
-        .page-historiques .dashboard-content > .row {
-             margin-left: 0 !important;
-             margin-right: 0 !important;
-             padding-left: 0 !important; /* S'assurer que le padding est réinitialisé */
-             padding-right: 0 !important; /* S'assurer que le padding est réinitialisé */
-        }
-
-         /* Styles pour le tableau et les badges si non inclus ou surchargés par dashboard.css */
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .history-table th,
-        .history-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .history-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        .badge-success { background-color: #28a745; color: white; }
-        .badge-warning { background-color: #ffc107; color: #212529; }
-        .badge-danger { background-color: #dc3545; color: white; }
-        .badge-info { background-color: #17a2b8; color: white; }
-        .badge-primary { background-color: #007bff; color: white; }
-        .badge-secondary { background-color: #6c757d; color: white; }
-
-    </style>
-    <!-- Styles spécifiques pour la page d'historique -->
+    <link href="/projet-pfe-v1/projet-t1/public/assets/css/common.css" rel="stylesheet">
+    <link href="/projet-pfe-v1/projet-t1/public/assets/css/historiques.css" rel="stylesheet">
 </head>
 <body class="page-historiques">
     <div class="container">
@@ -74,8 +21,10 @@
                 <li><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
                 <li class="active"><a href="/projet-pfe-v1/projet-t1/public/historiques"><i class="fas fa-history"></i> Historiques</a></li>
-                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                <?php endif; ?>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
                     <li><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
                 <?php endif; ?>
             </ul>
@@ -96,12 +45,20 @@
                 <div class="profile" id="profile-menu">
                     <!-- <img src="https://via.placeholder.com/40" alt="Profile"> -->
                     <div class="profile-info">
-                         <?php if (isset($_SESSION['username'])): ?>
-                            <span class="name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'])); ?></span>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <span class="name"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Utilisateur'); ?></span>
+                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? '')); ?></span>
                         <?php else: ?>
                             <span class="name">Invité</span>
                             <span class="role">Non connecté</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-title">Mon compte</div>
+                        <div class="dropdown-item">Profil</div>
+                        <div class="dropdown-item">Préférences</div>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <a href="/projet-pfe-v1/projet-t1/public/logout" class="dropdown-item logout-item">Se déconnecter</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -133,7 +90,6 @@
                                     <option value="">Tous</option>
                                     <option value="workorder" <?php echo ($_GET['entite_type'] ?? '') === 'workorder' ? 'selected' : ''; ?>>Work Order</option>
                                     <option value="equipement" <?php echo ($_GET['entite_type'] ?? '') === 'equipement' ? 'selected' : ''; ?>>Équipement</option>
-                                    <option value="user" <?php echo ($_GET['entite_type'] ?? '') === 'user' ? 'selected' : ''; ?>>Utilisateur</option>
                                     <option value="configuration" <?php echo ($_GET['entite_type'] ?? '') === 'configuration' ? 'selected' : ''; ?>>Configuration</option>
                                 </select>
                             </div>
@@ -184,20 +140,27 @@
                                         <?php foreach ($historique as $action): ?>
                                             <tr>
                                                 <td><?php echo date('d/m/Y H:i', strtotime($action['date_action'])); ?></td>
-                                                <td><?php echo htmlspecialchars($action['prenom'] . ' ' . $action['nom']); ?></td>
+                                                <td><?php echo htmlspecialchars($action['username']); ?></td>
                                                 <td>
                                                     <span class="badge bg-<?php 
                                                         echo match($action['action_type']) {
                                                             'affectation' => 'success',
                                                             'desaffectation' => 'warning',
                                                             'configuration' => 'info',
+                                                            'generation' => 'primary',
                                                             'creation' => 'primary',
                                                             'modification' => 'secondary',
                                                             'suppression' => 'danger',
                                                             default => 'secondary'
                                                         };
                                                     ?>">
-                                                        <?php echo ucfirst($action['action_type']); ?>
+                                                        <?php 
+                                                            if (($action['action_type'] === 'creation' || $action['action_type'] === 'generation') && $action['entite_type'] === 'configuration') {
+                                                                echo 'Generation';
+                                                            } else {
+                                                                echo ucfirst($action['action_type']);
+                                                            }
+                                                        ?>
                                                     </span>
                                                 </td>
                                                 <td>
@@ -222,8 +185,14 @@
     <!-- <script src="/projet-pfe-v1/projet-t1/public/assets/js/script.js"></script> -->
 
     <script>
-        // Script pour gérer l'affichage conditionnel du champ Entite ID si nécessaire
-        // Ou pour toute autre interactivité sur la page
+        document.addEventListener('DOMContentLoaded', function() {
+             const profileMenu = document.getElementById('profile-menu');
+            if (profileMenu) {
+                profileMenu.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            }
+        });
     </script>
 
 </body>

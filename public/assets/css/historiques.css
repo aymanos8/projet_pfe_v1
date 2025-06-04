@@ -1,0 +1,236 @@
+/* public/assets/css/historiques.css */
+
+/* Styles spécifiques pour la page Historiques */
+.page-historiques .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    background-color: var(--light-gray);
+}
+
+.page-historiques .dashboard-content {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Styles pour le tableau d'historique */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.history-table th,
+.history-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.history-table th {
+    background-color: #f5f6fa;
+    font-weight: 600;
+}
+
+/* Styles pour les badges */
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.bg-success {
+    background-color: #198754!important;
+}
+
+.bg-warning {
+    background-color: #ffc107!important;
+}
+
+.bg-danger {
+    background-color: #dc3545!important;
+}
+
+.bg-info {
+    background-color: #0dcaf0!important;
+}
+
+.bg-primary {
+    background-color: #0d6efd!important;
+}
+
+.bg-secondary {
+    background-color: #6c757d!important;
+}
+
+/* Styles pour les filtres */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-historiques .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .form-control,
+    .form-select {
+        margin-bottom: 10px;
+    }
+}
+
+/* Styles pour les badges (si non couverts par common.css ou Bootstrap) */
+/* Assurez-vous que les classes de Bootstrap (bg-success, etc.) sont utilisées dans la vue */
+/* Si des styles supplémentaires sont nécessaires pour les badges sur cette page, ajoutez-les ici */
+/* .badge-success { background-color: #28a745; color: white; } */
+/* ... autres styles de badge ... */
+
+/* Ajustements spécifiques si Bootstrap est utilisé */
+.card.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.row.g-3 {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--bs-gutter-y) * -1);
+    margin-right: calc(var(--bs-gutter-x) * -.5);
+    margin-left: calc(var(--bs-gutter-x) * -.5);
+}
+
+.row.g-3 > .col, .row.g-3 > [class^="col-"] {
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    margin-top: var(--bs-gutter-y);
+}
+
+.col-md-3 {
+    flex: 0 0 auto;
+    width: 25%;
+}
+
+.col-12 {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.table {
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--bs-border-color);
+    --bs-table-accent-bg: transparent;
+    --bs-table-striped-color: var(--bs-body-color);
+    --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+    --bs-table-active-color: var(--bs-body-color);
+    --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+    --bs-table-hover-color: var(--bs-body-color);
+    --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--bs-table-color);
+    vertical-align: top;
+    border-color: var(--bs-table-border-color);
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.5rem 0.5rem;
+    background-color: var(--bs-table-bg);
+    border-bottom-width: 1px;
+    box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: var(--bs-table-striped-bg);
+    color: var(--bs-table-striped-color);
+}
+
+.table th {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Styles to override common.css specific to historiques page layout */
+/* These might be needed if the common.css layout rules are too generic */
+/* body.page-historiques .main-content { ... } */
+/* body.page-historiques .dashboard-content { ... } */ 

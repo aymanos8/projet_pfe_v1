@@ -89,27 +89,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Ajouter des styles pour les badges de statut
-    const style = document.createElement('style');
-    style.textContent = `
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            text-transform: capitalize;
-        }
-        .status-badge.status-1 {
-            background-color: #ffd700;
-            color: #000;
-        }
-        .status-badge.status-2 {
-            background-color: #3498db;
-            color: white;
-        }
-        .status-badge.status-3 {
-            background-color: #2ecc71;
-            color: white;
-        }
-    `;
-    document.head.appendChild(style);
+    // Ajouter des styles pour les badges de statut UNIQUEMENT sur la page du tableau de bord des work orders
+    const workOrdersTable = document.getElementById('work-orders-table');
+    if (workOrdersTable) {
+        const style = document.createElement('style');
+        style.textContent = `
+            .status-badge {
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                text-transform: capitalize;
+            }
+            .status-badge.status-1 {
+                background-color: #ffd700;
+                color: #000;
+            }
+            .status-badge.status-2 {
+                background-color: #3498db;
+                color: white;
+            }
+            .status-badge.status-3 {
+                background-color: #2ecc71;
+                color: white;
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }); 

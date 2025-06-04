@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../models/Equipement.php';
 require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../models/Configuration.php';
+require_once __DIR__ . '/AuthController.php';
+require_once __DIR__ . '/../models/Utilisateur.php';
+require_once __DIR__ . '/../models/HistoriqueAction.php';
 
 class ConfigController {
     private $twig;
@@ -95,6 +99,37 @@ class ConfigController {
                 $config = $template->render($_POST);
                 $_SESSION['generated_config'] = $config;
                 
+                // Récupérer l'ID de l'équipement et de l'utilisateur connecté
+                $equipementId = $_POST['equipement_id'] ?? null;
+                $userId = AuthController::getUserId(); // Récupérer l'ID de l'utilisateur connecté
+
+                // Enregistrer la configuration dans la base de données
+                if ($equipementId !== null && $userId !== null) {
+                    $database = Database::getInstance();
+                    $configModel = new Configuration($database->getConnection());
+                    
+                    $configId = $configModel->saveConfiguration($equipementId, $userId, $config);
+
+                    if ($configId !== false) {
+                         // Enregistrer l'action dans l'historique
+                        $historiqueModel = new HistoriqueAction($database); // Instancier le modèle HistoriqueAction
+                        $historiqueModel->addAction(
+                            $userId,
+                            'creation', // Revenir à 'creation' pour la compatibilité d'affichage
+                            'configuration',
+                            $configId, // ID de la configuration créée
+                            "Configuration générée pour l'équipement #" . $equipementId
+                        );
+                        $_SESSION['success'] = "Configuration générée et enregistrée avec succès.";
+                    } else {
+                        $_SESSION['error'] = "Configuration générée, mais erreur lors de l'enregistrement.";
+                    }
+                } else if ($equipementId === null) {
+                     $_SESSION['warning'] = "Configuration générée, mais non liée à un équipement car l'ID est manquant.";
+                } else if ($userId === null) {
+                     $_SESSION['warning'] = "Configuration générée, mais non liée à un utilisateur car l'ID est manquant (utilisateur non connecté ?).";
+                }
+
                 // Unset form data from session after successful generation
                 unset($_SESSION['form_data']);
 

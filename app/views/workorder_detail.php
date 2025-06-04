@@ -3,52 +3,29 @@ if (!$workorder) {
     echo "Aucun work order sélectionné.";
     exit;
 }
+
+function statut_label($status) {
+    switch ($status) {
+        case '1': return '<span class="status-badge status-1">En Attente</span>';
+        case '2': return '<span class="status-badge status-2">En Cours</span>';
+        case '3': return '<span class="status-badge status-3">Terminé</span>';
+        default: return htmlspecialchars($status);
+    }
+}
+
+// Inclure la fonction statut_label depuis all_workorders.php
+// require_once __DIR__ . '/all_workorders.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Détail Work Order</title>
-    <link rel="stylesheet" href="../../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../public/assets/css/common.css">
+    <link rel="stylesheet" href="../../public/assets/css/workorder_detail.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .workorder-detail-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            padding: 40px 32px 32px 32px;
-            max-width: 700px;
-            margin: 50px auto 0 auto;
-        }
-        .workorder-detail-card h2 {
-            font-size: 2rem;
-            margin-bottom: 18px;
-            color: #2d3a4b;
-        }
-        .workorder-detail-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 30px 0;
-        }
-        .workorder-detail-list li {
-            margin-bottom: 14px;
-            font-size: 1.08rem;
-        }
-        .workorder-detail-label {
-            font-weight: 600;
-            color: #3b4a5a;
-            min-width: 120px;
-            display: inline-block;
-        }
-        .workorder-description {
-            background: #f5f6fa;
-            border-radius: 8px;
-            padding: 18px 20px;
-            color: #222;
-            font-size: 1.08rem;
-            margin-bottom: 0;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -62,8 +39,12 @@ if (!$workorder) {
                 <li class="active"><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
-                <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
-                <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                <li><a href="/projet-pfe-v1/projet-t1/public/historiques"><i class="fas fa-history"></i> Historiques</a></li>
+                <?php endif; ?>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                <li><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php endif; ?>
             </ul>
             <div class="sidebar-footer">
                 <li><i class="fas fa-cog"></i> Paramètres</li>
@@ -72,6 +53,32 @@ if (!$workorder) {
         </nav>
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <input type="text" placeholder="Rechercher...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="profile" id="profile-menu">
+                    <div class="profile-info">
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <span class="name"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Utilisateur'); ?></span>
+                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? '')); ?></span>
+                        <?php else: ?>
+                            <span class="name">Invité</span>
+                            <span class="role">Non connecté</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-title">Mon compte</div>
+                        <div class="dropdown-item">Profil</div>
+                        <div class="dropdown-item">Préférences</div>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <a href="/projet-pfe-v1/projet-t1/public/logout" class="dropdown-item logout-item">Se déconnecter</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </header>
             <div class="dashboard-content">
                 <?php 
                     if (isset($_SESSION['success'])) {
@@ -95,15 +102,7 @@ if (!$workorder) {
                         <li><span class="workorder-detail-label">Date :</span> <?php echo htmlspecialchars($workorder['date']); ?></li>
                         <li><span class="workorder-detail-label">Statut :</span> 
                             <?php 
-                                function statut_label_detail($status) { // Définir la fonction localement ou l'importer
-                                    switch ($status) {
-                                        case '1': return '<span style="color: blue;">En Attente</span>'; // Adaptez le style
-                                        case '2': return '<span style="color: orange;">En Cours</span>'; // Adaptez le style
-                                        case '3': return '<span style="color: green;">Terminé</span>'; // Adaptez le style
-                                        default: return htmlspecialchars($status);
-                                    }
-                                }
-                                echo statut_label_detail($workorder['status']); 
+                                echo statut_label($workorder['status']);
                             ?>
                         </li>
                         <?php if (!empty($workorder['user_id'])): // Afficher l'utilisateur affecté si défini ?>
@@ -139,8 +138,6 @@ if (!$workorder) {
                                         <tr>
                                             <th>Type</th>
                                             <th>Modèle</th>
-                                            <th>Numéro de série</th>
-                                            <th>Statut</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -149,12 +146,6 @@ if (!$workorder) {
                                             <tr>
                                                 <td><?php echo htmlspecialchars($equipement['marque']); ?></td>
                                                 <td><?php echo htmlspecialchars($equipement['modele']); ?></td>
-                                                <td><?php echo htmlspecialchars($equipement['numero_serie']); ?></td>
-                                                <td>
-                                                    <span class="badge bg-<?php echo $equipement['statut'] === 'disponible' ? 'success' : 'warning'; ?>">
-                                                        <?php echo htmlspecialchars($equipement['statut']); ?>
-                                                    </span>
-                                                </td>
                                                 <td>
                                                     <a href="/projet-pfe-v1/projet-t1/public/configuration/<?php echo $equipement['id']; ?>" 
                                                        class="btn btn-sm btn-primary me-2">
@@ -188,7 +179,7 @@ if (!$workorder) {
                                             <option value="">Sélectionner un équipement</option>
                                             <?php foreach ($equipementsDisponiblesCompatibles as $equipement): ?>
                                                 <option value="<?php echo $equipement['id']; ?>">
-                                                    <?php echo htmlspecialchars($equipement['marque'] . ' - ' . $equipement['modele'] . ' (' . $equipement['numero_serie'] . ')'); ?>
+                                                    <?php echo htmlspecialchars($equipement['marque'] . ' - ' . $equipement['modele']); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -222,5 +213,16 @@ if (!$workorder) {
             </div>
         </main>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+             const profileMenu = document.getElementById('profile-menu');
+            if (profileMenu) {
+                profileMenu.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

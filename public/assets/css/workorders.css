@@ -1,0 +1,110 @@
+/* public/assets/css/workorders.css */
+
+/* Work Orders Table Styles */
+.work-orders {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.work-orders h2 {
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filters select {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: white;
+}
+
+/* Style pour la cellule de statut dans le tableau */
+td:nth-child(5) { /* Ajustez si la colonne statut change */
+    min-width: 100px;
+}
+
+/* Styles pour les liens dans le tableau (ex: Voir détail) */
+.btn-link {
+    display: inline-block;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-link:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Styles pour les boutons d'affectation/modification */
+.assignment-display, .assignment-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hide-flex {
+    display: none;
+}
+
+.show-flex {
+    display: flex;
+}
+
+.assignment-form select {
+     padding: 4px 8px;
+     border-radius: 4px;
+     border: 1px solid #ccc;
+     font-size: 0.9rem;
+}
+
+.assignment-form button {
+     padding: 4px 8px;
+     border-radius: 4px;
+     border: none;
+     background-color: #28a745; /* Vert */
+     color: white;
+     cursor: pointer;
+}
+
+.assignment-form button:hover {
+     background-color: #218838;
+}
+
+.btn-edit-assignment {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #007bff; /* Bleu */
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.btn-edit-assignment:hover {
+     background-color: #0056b3;
+     border-color: #0056b3;
+}
+
+/* Responsive Design specific to Work Orders */
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filters .col-md-3 { /* Si Bootstrap grid est utilisé */
+        width: 100%;
+    }
+} 

@@ -1,168 +1,124 @@
-body {
-    background: #f8fafc;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-.wrapper {
-    display: flex;
-    min-height: 100vh;
-}
-.sidebar {
-    width: 250px;
-    background: #1e293b;
-    color: #fff;
-    padding: 32px 0 0 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-.sidebar h2 {
-    font-size: 1.5rem;
-    margin-bottom: 32px;
+/* Styles pour la page Equipements */
+
+/* Styles pour les badges de disponibilité */
+#equipements-table .status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
     text-align: center;
-    letter-spacing: 1px;
+    margin: 2px;
 }
-.sidebar ul {
-    list-style: none;
-    padding: 0;
+
+#equipements-table .status-badge.disponible {
+    background-color: #28a745; /* Vert */
+    color: #fff; /* Texte blanc pour contraste */
 }
-.sidebar ul li {
-    padding: 16px 32px;
-    cursor: pointer;
-    transition: background 0.2s;
+
+#equipements-table .status-badge.indisponible {
+    background-color: #dc3545; /* Rouge */
+    color: #fff; /* Texte blanc pour contraste */
 }
-.sidebar ul li.active, .sidebar ul li:hover {
-    background: #2563eb;
-}
-.sidebar ul li a {
-    color: #fff;
-    text-decoration: none;
-    display: block;
-}
-.main-content {
-    flex: 1;
-    padding: 40px;
-    background: #f8fafc;
-}
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px #0001;
-    padding: 32px;
-}
-.search-bar {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 24px;
-}
-.btn-add {
-    background: #2563eb;
-    color: #fff;
+
+/* Styles pour les boutons */
+.btn {
+    padding: 10px 15px;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    float: right;
+    border-radius: 4px;
     cursor: pointer;
-    margin-bottom: 16px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-}
-th, td {
-    padding: 14px 10px;
-    text-align: left;
-}
-th {
-    background: #f1f5f9;
-}
-tr:nth-child(even) {
-    background: #f9fafb;
-}
-.badge-dispo {
-    background: #d1fae5;
-    color: #059669;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.95em;
-}
-.badge-indispo {
-    background: #fee2e2;
-    color: #dc2626;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.95em;
-}
-.action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: 8px;
-}
-.action-btn.edit {
-    color: #2563eb;
-}
-.action-btn.delete {
-    color: #dc2626;
+    font-size: 1em;
+    margin-right: 10px;
+    text-decoration: none; /* Assure que les liens stylisés en bouton n'ont pas de soulignement */
+    display: inline-block; /* Permet d'appliquer padding et margin */
 }
 
-/* Harmonisation avec la page Work-Orders */
-
-.work-orders-card {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+.btn:last-child {
+    margin-right: 0; /* Supprime la marge à droite pour le dernier bouton dans un groupe */
 }
 
-.work-orders-card h2 {
-    margin-bottom: 20px;
+.btn-success {
+    background-color: #28a745;
+    color: white;
 }
 
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-primary {
+    background-color: #007bff; /* Bleu */
+    color: white;
+    padding: 10px 20px; /* Un peu plus de padding pour le bouton principal */
+    margin-bottom: 20px; /* Ajoute de l'espace en dessous du bouton */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-warning {
+    background-color: #ffc107; /* Jaune/Orange */
+    color: #212529; /* Texte sombre pour contraste */
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Rouge */
+    color: white; /* Texte blanc */
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-sm {
+    padding: 5px 10px; /* Padding réduit pour les petits boutons */
+    font-size: 0.875em; /* Taille de police réduite */
+    line-height: 1.5; /* Hauteur de ligne ajustée */
+    border-radius: 0.2rem; /* Bordure légèrement plus petite */
+}
+
+/* Styles pour le tableau des équipements */
 #equipements-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse; /* Supprime l'espace entre les bordures des cellules */
+    margin-top: 20px;
 }
 
-#equipements-table th, #equipements-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+#equipements-table th,
+#equipements-table td {
+    border: 1px solid #ddd; /* Bordure légère pour les cellules */
+    padding: 12px; /* Espacement interne des cellules */
+    text-align: center; 
 }
 
 #equipements-table th {
-    background-color: #f5f6fa;
-    font-weight: 600;
+    background-color: #f2f2f2; /* Fond gris clair pour l'en-tête */
+    font-weight: bold;
+    color: #333;
+    text-align: left; /* Alignement du texte à gauche pour l'en-tête */
 }
 
-.status-badge {
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    text-transform: capitalize;
-}
-.status-badge.status-1 {
-    background-color: #ffd700;
-    color: #000;
-}
-.status-badge.status-0 {
-    background-color: #eee;
-    color: #888;
+
+
+#equipements-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Couleur de fond différente pour les lignes paires */
 }
 
-@media (max-width: 900px) {
-    .work-orders-card {
-        padding: 10px;
-    }
-    #equipements-table th, #equipements-table td {
-        padding: 8px 6px;
-    }
+#equipements-table tbody tr:hover {
+    background-color: #e9e9e9; /* Couleur de fond au survol des lignes */
 }
+
+/* Ajoutez d'autres styles spécifiques à Equipements si nécessaire ici */

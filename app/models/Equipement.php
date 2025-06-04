@@ -25,16 +25,14 @@ class Equipement {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addEquipement($modele, $marque, $type_interfaces, $gamme, $numero_serie, $technology, $offre, $debit) {
-        $query = "INSERT INTO equipements_reseau (modele, marque, type_interfaces, gamme, numero_serie, technology, offre, debit) 
-                 VALUES (:modele, :marque, :type_interfaces, :gamme, :numero_serie, :technology, :offre, :debit)";
+    public function addEquipement($modele, $marque, $gamme, $technology, $offre, $debit) {
+        $query = "INSERT INTO equipements_reseau (modele, marque, gamme, technology, offre, debit) 
+                 VALUES (:modele, :marque, :gamme, :technology, :offre, :debit)";
         $stmt = $this->db->prepare($query);
         return $stmt->execute([
             'modele' => $modele,
             'marque' => $marque,
-            'type_interfaces' => $type_interfaces,
             'gamme' => $gamme,
-            'numero_serie' => $numero_serie,
             'technology' => $technology,
             'offre' => $offre,
             'debit' => $debit
@@ -45,40 +43,54 @@ class Equipement {
         $query = "UPDATE equipements_reseau SET 
                  modele = :modele,
                  marque = :marque,
-                 type_interfaces = :type_interfaces,
                  gamme = :gamme,
                  statut = :statut,
-                 numero_serie = :numero_serie
+                 technology = :technology,
+                 offre = :offre,
+                 debit = :debit
                  WHERE id = :id";
         $stmt = $this->db->prepare($query);
-        return $stmt->execute(array_merge($data, ['id' => $id]));
+        // Filtrer les clés non existantes dans $data avant de fusionner
+        $allowed_keys = ['modele', 'marque', 'gamme', 'statut', 'technology', 'offre', 'debit'];
+        $filtered_data = array_intersect_key($data, array_flip($allowed_keys));
+        return $stmt->execute(array_merge($filtered_data, ['id' => $id]));
     }
 
     public function affecterEquipement($work_order_id, $equipement_id) {
         // Vérifier si l'équipement est disponible
         $equipement = $this->getEquipementById($equipement_id);
         if ($equipement['statut'] !== 'disponible') {
-            return false;
+            return false; // L'équipement n'est pas disponible
+        }
+
+        // Vérifier si l'affectation existe déjà
+        $checkQuery = "SELECT COUNT(*) FROM affectations_workorders WHERE work_order_id = :work_order_id AND equipement_id = :equipement_id";
+        $checkStmt = $this->db->prepare($checkQuery);
+        $checkStmt->execute([
+            'work_order_id' => $work_order_id,
+            'equipement_id' => $equipement_id
+        ]);
+        if ($checkStmt->fetchColumn() > 0) {
+            // L'affectation existe déjà
+            // error_log("DEBUG: Affectation Work Order #" . $work_order_id . " Equipement #" . $equipement_id . " already exists.");
+            return false; // Indique que l'affectation n'a pas été effectuée (car déjà existante)
         }
 
         try {
-            // Mettre à jour le statut de l'équipement
-            $query = "UPDATE equipements_reseau SET statut = 'en_service' WHERE id = :id";
-            $stmt = $this->db->prepare($query);
-            $stmt->execute(['id' => $equipement_id]);
-
             // Créer l'affectation
             $query = "INSERT INTO affectations_workorders (work_order_id, equipement_id) 
                      VALUES (:work_order_id, :equipement_id)";
             $stmt = $this->db->prepare($query);
-            $stmt->execute([
+            $success = $stmt->execute([
                 'work_order_id' => $work_order_id,
                 'equipement_id' => $equipement_id
             ]);
 
-            return true;
+            // Retourner true si l'insertion a réussi, false sinon
+            return $success;
+
         } catch (Exception $e) {
-            error_log("Erreur DB dans Equipement::affecterEquipement : " . $e->getMessage());
+            error_log("Erreur DB dans Equipement::affecterEquipement lors de l'insertion : " . $e->getMessage());
             return false;
         }
     }
@@ -194,6 +206,19 @@ class Equipement {
             error_log("Erreur lors de la récupération de l'équipement par numéro de série : " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Vérifie si un work order a déjà un équipement affecté.
+     *
+     * @param int $work_order_id L'ID du work order.
+     * @return bool Retourne true si un équipement est déjà affecté, false sinon.
+     */
+    public function hasEquipementAffected($work_order_id) {
+        $query = "SELECT COUNT(*) FROM affectations_workorders WHERE work_order_id = :work_order_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['work_order_id' => $work_order_id]);
+        return $stmt->fetchColumn() > 0;
     }
 
     // Nouvelle méthode pour désaffecter un équipement d'un work order

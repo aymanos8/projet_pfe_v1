@@ -46,6 +46,16 @@ $router->get('/configuration/{id}', [ConfigController::class, 'index']);
 $router->get('/logout', [AuthController::class, 'logout']);
 $router->get('/statistics', [StatisticsController::class, 'index']);
 $router->get('/historiques', [HistoriqueController::class, 'index']);
+// Route pour afficher le formulaire d'ajout d'équipement
+$router->get('/equipements/ajouter', [EquipementController::class, 'showAddForm']);
+
+// Route pour rendre un équipement indisponible (pour admin)
+$router->get('/equipements/set-indisponible/{id}', [EquipementController::class, 'setIndisponible']);
+// Route pour rendre un équipement disponible (pour admin)
+$router->get('/equipements/set-disponible/{id}', [EquipementController::class, 'setDisponible']);
+
+// Route pour supprimer un équipement (pour admin)
+$router->get('/equipements/supprimer/{id}', [EquipementController::class, 'supprimerEquipement']);
 
 // Routes POST
 $router->post('/user/create', [ConfigController::class, 'create']);
@@ -56,6 +66,8 @@ $router->post('/login', [AuthController::class, 'login']);
 $router->post('/register', [AuthController::class, 'register']);
 $router->post('/workorder/affecter-utilisateur', [WorkorderController::class, 'affecterWorkOrder']);
 $router->post('/workorder/complete', [WorkorderController::class, 'completeWorkOrder']);
+// Route pour traiter la soumission du formulaire d'ajout d'équipement
+$router->post('/equipements/ajouter', [EquipementController::class, 'ajouterEquipement']);
 
 // Exécution du routeur
 $router->run();

@@ -1,5 +1,9 @@
 <?php
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../models/Equipement.php';
 require_once __DIR__ . '/../models/WorkOrder.php'; // Peut être utile pour les liens ou infos WO
@@ -9,12 +13,12 @@ require_once __DIR__ . '/../models/HistoriqueAction.php';
 
 class HistoriqueController {
     public function index() {
-        // Vérifier si l'utilisateur est connecté et a le rôle approprié si nécessaire
-        // if (!AuthController::isLoggedIn() || AuthController::getUserRole() !== 'admin') {
-        //     // Rediriger ou afficher un message d'erreur
-        //     // header('Location: /projet-pfe-v1/projet-t1/public/login');
-        //     // exit;
-        // }
+        // Vérifier si l'utilisateur est connecté et a le rôle approprié (admin)
+        if (!AuthController::isLoggedIn() || AuthController::getUserRole() !== 'admin') {
+            // Rediriger vers une autre page (par exemple, le tableau de bord) ou afficher un message d'erreur
+            header('Location: /projet-pfe-v1/projet-t1/public/dashboard'); // Redirection vers le dashboard
+            exit; // Assurer que le script s'arrête après la redirection
+        }
 
         try {
             $database = Database::getInstance();
@@ -30,13 +34,8 @@ class HistoriqueController {
             $userId = $_GET['user_id'] ?? null;
 
             // Récupérer l'historique selon les filtres
-            if ($entiteType && $entiteId) {
-                $historique = $historiqueModel->getHistoriqueByEntite($entiteType, $entiteId);
-            } elseif ($userId) {
-                $historique = $historiqueModel->getHistoriqueByUser($userId);
-            } else {
-                $historique = $historiqueModel->getHistoriqueByDateRange($dateDebut, $dateFin);
-            }
+            // Utiliser la nouvelle méthode getFilteredHistorique qui gère toutes les combinaisons de filtres
+            $historique = $historiqueModel->getFilteredHistorique($dateDebut, $dateFin, $entiteType, $entiteId, $userId);
 
             // Récupérer tous les utilisateurs pour le filtre (utiliser la méthode getAll)
             $users = $userModel->getAll();

@@ -1,0 +1,42 @@
+/* public/assets/css/workorder_detail.css */
+
+.container .main-content {
+    margin-left: 250px;
+}
+
+.workorder-detail-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 40px 32px 32px 32px;
+    max-width: 700px;
+    margin: 50px auto 0 auto;
+}
+.workorder-detail-card h2 {
+    font-size: 2rem;
+    margin-bottom: 18px;
+    color: #2d3a4b;
+}
+.workorder-detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+}
+.workorder-detail-list li {
+    margin-bottom: 14px;
+    font-size: 1.08rem;
+}
+.workorder-detail-label {
+    font-weight: 600;
+    color: #3b4a5a;
+    min-width: 120px;
+    display: inline-block;
+}
+.workorder-description {
+    background: #f5f6fa;
+    border-radius: 8px;
+    padding: 18px 20px;
+    color: #222;
+    font-size: 1.08rem;
+    margin-bottom: 0;
+} 

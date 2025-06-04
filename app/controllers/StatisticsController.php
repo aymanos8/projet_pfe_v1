@@ -60,11 +60,12 @@ class StatisticsController // Ne plus étendre Controller pour l'instant
         $equipements = $this->equipementModel->getAllEquipements();
         $equipementsByStatus = [
             'disponible' => 0,
-            'en_service' => 0,
-            'maintenance' => 0
+            'indisponible' => 0
         ];
         foreach ($equipements as $equipement) {
-            $equipementsByStatus[$equipement['statut']]++;
+            if (isset($equipementsByStatus[$equipement['statut']])) {
+                $equipementsByStatus[$equipement['statut']]++;
+            }
         }
 
         // Statistiques des utilisateurs

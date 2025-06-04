@@ -1,271 +1,23 @@
-:root {
-    --primary-color: #2c3e50;
-    --secondary-color: #34495e;
-    --accent-color: #3498db;
-    --text-color: #333;
-    --light-gray: #f5f6fa;
-    --border-color: #ddd;
+/* public/assets/css/dashboard.css */
+
+.page-dashboard .main-content {
+    /* margin-left: 250px !important; */ /* Ensure correct spacing */
+    /* padding-left: 0 !important; */ /* Remove left padding */
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.page-dashboard .dashboard-content {
+    padding-left: 0;
+    padding-right: 0;
 }
 
-body {
-    background-color: var(--light-gray);
+.page-dashboard .dashboard-content > .summary-cards,
+.page-dashboard .dashboard-content > .work-orders {
+    /* margin-left: 0 !important; */
+    /* padding-left: 0 !important; */
 }
 
-.container {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
-}
-
-/* Sidebar Styles */
-.sidebar {
-    width: 250px;
-    min-width: 250px;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-}
-
-.sidebar-header {
-    padding: 0 20px;
-    margin-bottom: 30px;
-}
-
-.sidebar-header h2 {
-    font-size: 1.5rem;
-    color: white;
-}
-
-.nav-links {
-    list-style: none;
-    flex-grow: 1;
-    padding: 0;
-}
-
-.nav-links li {
-    padding: 0;
-}
-
-.nav-links li a {
-    color: inherit;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    height: 100%;
-    padding: 15px 20px;
-    transition: background-color 0.3s;
-    border-radius: 0;
-}
-
-.nav-links li a:hover, .nav-links li.active a {
-    background-color: var(--secondary-color);
-}
-
-.nav-links li.active a {
-    font-weight: bold;
-}
-
-.sidebar-footer {
+.main-content .dashboard-content {
     padding: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: auto;
-}
-
-.version {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 10px;
-    display: block;
-}
-
-/* Main Content Styles */
-.main-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    flex-basis: 0;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Styles spécifiques pour la page Historiques */
-.page-historiques .main-content {
-    /* S'assurer que le contenu principal prend l'espace flexible restant */
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0;
-    width: auto;
-    min-width: 0;
-    padding: 0; /* Assurer pas de padding ici */
-    box-sizing: border-box;
-}
-
-/* Top Bar Styles */
-.top-bar {
-    background-color: white;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 1;
-}
-
-.search-container {
-    position: relative;
-    width: 300px;
-}
-
-.search-container input {
-    width: 100%;
-    padding: 10px 15px;
-    padding-left: 40px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-}
-
-.search-container i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-}
-
-.profile {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: #f5f6fa;
-    padding: 6px 18px 6px 10px;
-    border-radius: 24px;
-    box-shadow: 0 1px 4px rgba(44,62,80,0.06);
-    transition: box-shadow 0.2s;
-}
-
-.profile:hover {
-    box-shadow: 0 2px 8px rgba(44,62,80,0.12);
-}
-
-.profile img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid #e0e4ea;
-}
-
-.profile-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.1;
-}
-
-.profile-info .name {
-    font-weight: bold;
-    color: #2c3e50;
-    font-size: 1rem;
-}
-
-.profile-info .role {
-    font-size: 0.85rem;
-    color: #888;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 54px;
-    right: 0;
-    min-width: 180px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-    z-index: 100;
-    padding: 10px 0;
-    font-size: 1rem;
-    animation: fadeIn 0.18s;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.profile:hover .dropdown-menu,
-.profile.active .dropdown-menu {
-    display: block;
-}
-
-.dropdown-title {
-    font-weight: bold;
-    padding: 10px 20px 8px 20px;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 2px;
-}
-
-.dropdown-item {
-    padding: 10px 20px;
-    color: #333;
-    cursor: pointer;
-    transition: background 0.15s;
-}
-
-.dropdown-item:hover {
-    background: #f5f6fa;
-    color: #3498db;
-}
-
-/* Dashboard Content Styles */
-.dashboard-content {
-    padding: 30px;
-    flex-grow: 1;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Styles spécifiques pour le contenu du tableau de bord sur la page Historiques */
-.page-historiques .dashboard-content {
-     /* Appliquer le padding interne ici */
-     padding: 30px;
-     flex-grow: 1;
-     width: 100%; /* Assurer qu'il prend toute la largeur du parent */
-     box-sizing: border-box;
-}
-
-/* Réinitialiser les marges et paddings potentiels des éléments enfants directs de dashboard-content */
-.dashboard-content > h2,
-.dashboard-content > .card,
-.dashboard-content > .row {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-
-.dashboard-content .card-body {
-    padding: 15px;
-}
-
-/* Styles spécifiques pour le card-body sur la page Historiques si nécessaire */
-.page-historiques .card-body {
-     padding: 15px; /* Rétablir un padding interne spécifique aux cartes */
 }
 
 /* Summary Cards Styles */
@@ -302,152 +54,54 @@ body {
     color: var(--text-color);
 }
 
+/* Responsive Design specific to Dashboard */
+@media (max-width: 768px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Work Orders Table Styles */
 .work-orders {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+    width: 100%; /* Ensure it takes full width */
+    margin-bottom: 20px; /* Add some space below */
 }
 
 .work-orders h2 {
+    margin-top: 0;
     margin-bottom: 20px;
+    color: var(--text-color);
 }
 
-.filters {
+.work-orders .filters {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
+    align-items: center; /* Align filter elements vertically */
 }
 
-.filters select {
-    padding: 8px 15px;
+.work-orders .filters select {
+    padding: 8px;
     border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: white;
+    border-radius: 4px;
 }
 
-table {
-    width: 100%;
+.work-orders table {
+    width: 100%; /* Ensure table takes full width of its container */
     border-collapse: collapse;
 }
 
-th, td {
+.work-orders th, .work-orders td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
 }
 
-th {
+.work-orders th {
     background-color: var(--light-gray);
     font-weight: 600;
 }
-
-/* Style pour la cellule de statut dans le tableau */
-td:nth-child(5) {
-    min-width: 100px;
-}
-
-/* Status Badge Styles */
-.status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.85em;
-    font-weight: 600;
-    text-align: center;
-    min-width: 80px;
-    white-space: nowrap;
-}
-
-.status-1 {
-    background-color: #ffecb3;
-    color: #663c00;
-    border: 1px solid #ffb300;
-}
-
-.status-2 {
-    background-color: #bbdefb;
-    color: #0d47a1;
-    border: 1px solid #2196f3;
-}
-
-.status-3 {
-    background-color: #c8e6c9;
-    color: #1b5e20;
-    border: 1px solid #4caf50;
-}
-
-/* History Sidebar Styles */
-.history-sidebar {
-}
-
-.history-sidebar h2 {
-}
-
-.history-list {
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .container {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        min-width: auto;
-        flex-direction: row;
-        padding: 10px;
-        position: relative;
-        height: auto;
-        overflow-y: visible;
-    }
-
-    .nav-links {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .nav-links li {
-        padding: 10px;
-    }
-
-    .nav-links li a {
-        padding: 10px 15px;
-    }
-
-    .sidebar-footer {
-        display: none;
-    }
-
-    .history-sidebar {
-        width: 100%;
-        margin-top: 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .summary-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .top-bar {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .search-container {
-        width: 100%;
-    }
-
-    .filters {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .filters .col-md-3 {
-        width: 100%;
-    }
-} 

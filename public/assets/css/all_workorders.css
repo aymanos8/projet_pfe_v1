@@ -1,5 +1,9 @@
 /* Style pour la page Tous les Work Orders */
 
+/* .main-content {
+    margin-left: 250px;
+} */
+
 .work-orders {
     background-color: white;
     padding: 20px;
@@ -75,21 +79,49 @@ td .assignment-form {
 
 /* Styles pour le bouton Modifier */
 #all-work-orders-table td .btn-edit-assignment {
-    padding: 2px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f0f0f0;
+    /* padding: 2px 8px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    background-color: #f0f0f0 !important;
     cursor: pointer;
     font-size: 0.8em;
     transition: background-color 0.2s;
     vertical-align: middle;
-    margin: 0;
-    text-decoration: none; /* S'assurer qu'il n'y a pas de soulignement */
-    color: #333; /* Couleur de texte par défaut */
+    margin: 0 !important;
+    text-decoration: none !important;
+    color: #333 !important; */
 }
 
-#all-work-orders-table td .btn-edit-assignment:hover {
-    background-color: #e0e0e0;
+.btn-modifier-assignment {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    vertical-align: middle;
+    margin: 0;
+    text-decoration: none;
+}
+
+.btn-modifier-assignment:hover {
+    background-color: #0056b3;
+}
+
+#all-work-orders-table td .btn-modifier-assignment {
+    padding: 4px 12px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    background-color: #007bff !important;
+    color: white !important;
+    cursor: pointer !important;
+    font-size: 0.9em !important;
+    transition: background-color 0.2s ease !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+    text-decoration: none !important;
 }
 
 /* Classes de visibilité */

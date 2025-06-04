@@ -16,11 +16,12 @@ function disponibilite_label($status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des équipements</title>
-    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/dashboard.css">
+    <title>Liste des Équipements Réseau</title>
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/common.css">
+    <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/equipements.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="page-dashboard">
     <div class="container">
         <!-- Sidebar -->
         <nav class="sidebar">
@@ -32,8 +33,12 @@ function disponibilite_label($status) {
                 <li><a href="/projet-pfe-v1/projet-t1/public/workorders"><i class="fas fa-tasks"></i> Work-Orders</a></li>
                 <li class="active"><a href="/projet-pfe-v1/projet-t1/public/equipements"><i class="fas fa-server"></i> Équipements</a></li>
                 <li><a href="/projet-pfe-v1/projet-t1/public/configuration"><i class="fas fa-cogs"></i> Configurations</a></li>
-                <li><a href="#"><i class="fas fa-history"></i> Historiques</a></li>
-                <li><a href="#"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                <li><a href="/projet-pfe-v1/projet-t1/public/historiques"><i class="fas fa-history"></i> Historiques</a></li>
+                <?php endif; ?>
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                    <li><a href="/projet-pfe-v1/projet-t1/public/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <?php endif; ?>
             </ul>
             <div class="sidebar-footer">
                 <li><i class="fas fa-cog"></i> Paramètres</li>
@@ -50,14 +55,25 @@ function disponibilite_label($status) {
                 </div>
                 <div class="profile" id="profile-menu">
                     <div class="profile-info">
-                        <span class="name"></span>
-                        <span class="role">Administrateur</span>
+                         <?php if (AuthController::isLoggedIn()): ?>
+                            <span class="name"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Utilisateur'); ?></span>
+                            <span class="role"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? '')); ?></span>
+                        <?php else: ?>
+                            <span class="name">Invité</span>
+                            <span class="role">Non connecté</span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </header>
             <div class="dashboard-content">
                 <h2>Gestion des équipements</h2>
-                <table style="width:100%;margin-top:32px;background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.07);">
+                <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                <a href="/projet-pfe-v1/projet-t1/public/equipements/ajouter" class="btn btn-primary" style="margin-bottom: 20px;">Ajouter un équipement</a>
+                <?php endif; ?>
+
+                <!-- Le formulaire d'ajout d'équipement a été déplacé vers add_equipement.php -->
+
+                <table id="equipements-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -65,6 +81,9 @@ function disponibilite_label($status) {
                             <th>Modèle</th>
                             <th>Gamme</th>
                             <th>Disponibilité</th>
+                            <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                                <th>Actions</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,13 +96,30 @@ function disponibilite_label($status) {
                             <td><?php echo htmlspecialchars($equipement['gamme']); ?></td>
                             <td>
                                 <?php
-                                if ($equipement['statut'] === 'disponible') {
-                                    echo "<span style='background:#ffd700;color:#000;padding:5px 10px;border-radius:15px;font-size:0.8rem;'>Disponible</span>";
-                                } else {
-                                    echo "<span style='background:#eee;color:#888;padding:5px 10px;border-radius:15px;font-size:0.8rem;'>" . htmlspecialchars($equipement['statut']) . "</span>";
+                                // Utiliser les classes .status-badge
+                                switch ($equipement['statut']) {
+                                    case 'disponible':
+                                        echo '<span class="status-badge disponible">Disponible</span>';
+                                        break;
+                                    case 'indisponible':
+                                        echo '<span class="status-badge indisponible">Indisponible</span>';
+                                        break;
+                                    default:
+                                        // Encapsuler également le statut par défaut dans un span si nécessaire
+                                        echo '<span class="status-badge">' . htmlspecialchars($equipement['statut']) . '</span>';
                                 }
                                 ?>
                             </td>
+                            <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
+                                <td>
+                                    <?php if ($equipement['statut'] === 'disponible'): ?>
+                                        <a href="/projet-pfe-v1/projet-t1/public/equipements/set-indisponible/<?php echo htmlspecialchars($equipement['id']); ?>" class="btn btn-warning btn-sm">Rendre Indisponible</a>
+                                    <?php elseif ($equipement['statut'] === 'indisponible'): ?>
+                                         <a href="/projet-pfe-v1/projet-t1/public/equipements/set-disponible/<?php echo htmlspecialchars($equipement['id']); ?>" class="btn btn-success btn-sm">Rendre Disponible</a>
+                                    <?php endif; ?>
+                                    <a href="/projet-pfe-v1/projet-t1/public/equipements/supprimer/<?php echo htmlspecialchars($equipement['id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');">Supprimer</a>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -91,5 +127,16 @@ function disponibilite_label($status) {
             </div>
         </main>
     </div>
+    <!-- Le script JavaScript pour afficher/masquer le formulaire a été supprimé car le formulaire est sur une autre page -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+             const profileMenu = document.getElementById('profile-menu');
+            if (profileMenu) {
+                profileMenu.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

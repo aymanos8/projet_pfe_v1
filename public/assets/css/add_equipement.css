@@ -1,0 +1,93 @@
+/* Styles spécifiques pour la page Ajouter un équipement */
+
+#add-equipement-form-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 600px; /* Limiter la largeur du formulaire */
+    margin: 20px auto; /* Centrer le formulaire */
+}
+
+#add-equipement-form-container h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+.form-group select.form-control[multiple] {
+    height: auto;
+    min-height: 120px; /* Augmenter la hauteur pour les sélections multiples */
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none; /* Pour le lien Annuler stylisé en bouton */
+    display: inline-block; /* Pour que le lien se comporte comme un bouton */
+    text-align: center; /* Centrer le texte dans le bouton Annuler */
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Styles pour les messages d'alerte */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+/* Styles pour le conteneur des boutons si nécessaire */
+/* .form-buttons {
+    margin-top: 20px;
+    text-align: right;
+} */ 
