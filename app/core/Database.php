@@ -4,7 +4,7 @@ class Database {
     private static $instance = null;
     private $connection;
     private $host = 'localhost';
-    private $db_name = 'projet_pfe';
+    private $db_name = 'projet_pfe_f';
     private $username = 'root';
     private $password = '';
 

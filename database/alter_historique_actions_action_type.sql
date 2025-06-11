@@ -1,0 +1,1 @@
+ALTER TABLE `historique_actions` MODIFY COLUMN `action_type` ENUM('affectation', 'désaffectation', 'configuration', 'modification', 'creation', 'generation', 'suppression') NOT NULL; 

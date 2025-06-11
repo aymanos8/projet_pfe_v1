@@ -9,12 +9,9 @@ class AuthController {
      * Affiche la page de connexion.
      */
     public function showLoginForm() {
-        // Afficher les messages d'erreur ou de succès si présents
         $error = $_SESSION['error'] ?? null;
         $success = $_SESSION['success'] ?? null;
-        unset($_SESSION['error']);
-        unset($_SESSION['success']);
-
+        unset($_SESSION['error'], $_SESSION['success']);
         require __DIR__ . '/../views/login.php';
     }
 
@@ -22,12 +19,9 @@ class AuthController {
      * Affiche la page d'inscription.
      */
     public function showRegisterForm() {
-        // Afficher les messages d'erreur ou de succès si présents
         $error = $_SESSION['error'] ?? null;
         $success = $_SESSION['success'] ?? null;
-        unset($_SESSION['error']);
-        unset($_SESSION['success']);
-
+        unset($_SESSION['error'], $_SESSION['success']);
         require __DIR__ . '/../views/register.php';
     }
 

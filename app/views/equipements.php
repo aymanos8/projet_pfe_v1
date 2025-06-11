@@ -26,7 +26,7 @@ function disponibilite_label($status) {
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h2>test</h2>
+                <h2>NetManage</h2>
             </div>
             <ul class="nav-links">
                 <li><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
@@ -66,7 +66,7 @@ function disponibilite_label($status) {
                 </div>
             </header>
             <div class="dashboard-content">
-                <h2>Gestion des équipements</h2>
+                <h2>NetManage</h2>
                 <?php if (AuthController::isLoggedIn() && AuthController::getUserRole() === 'admin'): ?>
                 <a href="/projet-pfe-v1/projet-t1/public/equipements/ajouter" class="btn btn-primary" style="margin-bottom: 20px;">Ajouter un équipement</a>
                 <?php endif; ?>

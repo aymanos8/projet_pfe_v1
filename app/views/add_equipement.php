@@ -13,7 +13,7 @@
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h2>test</h2>
+                <h2>NetManage</h2>
             </div>
             <ul class="nav-links">
                 <li><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
@@ -79,7 +79,7 @@
                     }
                 }
                 ?>
-                <h2>Ajouter un nouvel équipement</h2>
+                <h2>NetManage</h2>
 
                 <div id="add-equipement-form-container">
                     <form id="new-equipement-form" action="/projet-pfe-v1/projet-t1/public/equipements/ajouter" method="POST">

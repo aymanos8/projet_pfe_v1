@@ -32,7 +32,7 @@ no tacacs-server host 172.17.17.74
 tacacs-server host 172.17.17.76
 tacacs-server host 172.17.17.76 single-connection timeout 1 
 tacacs-server directed-request
-tacacs-server key inwi2010
+tacacs-server key xxxx
 
 
 ! ======================================================
@@ -95,7 +95,7 @@ ip access-list standard ACL-SNMP
     permit 10.104.102.110 !!  ServiceNow  
 
 snmp-server community private123 RO ACL-SNMP
-snmp-server host 10.104.70.53 private123
+snmp-server host 10.104.70.53 xxxx
 no snmp-server enable traps
 snmp-server enable traps envmon
 snmp-server enable traps envmon shutdown 

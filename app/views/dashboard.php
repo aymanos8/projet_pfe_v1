@@ -24,7 +24,7 @@ function tech_label($tech) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
+    <title>NetManage</title>
     <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/common.css">
     <link rel="stylesheet" href="/projet-pfe-v1/projet-t1/public/assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -34,7 +34,7 @@ function tech_label($tech) {
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h2>test</h2>
+                <h2>NetManage</h2>
             </div>
             <ul class="nav-links">
                 <li class="active"><a href="/projet-pfe-v1/projet-t1/public/dashboard"><i class="fas fa-home"></i> Vue d'ensemble</a></li>
@@ -112,7 +112,7 @@ function tech_label($tech) {
 
                 <!-- Work Orders Table -->
                 <div class="work-orders">
-                    <h2>Work Orders Récents</h2>
+                    <h2>Work-Orders</h2>
                     <div class="filters">
                         <select id="technology-filter">
                             <option value="">Toutes les technologies</option>
